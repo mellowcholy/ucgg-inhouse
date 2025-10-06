@@ -1,0 +1,18 @@
+{
+  "name": "caitlyn",
+  "version": "1.0.0",
+  "description": "In-House bot for UCGG",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mellowcholy",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.22.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.37.0",
+    "eslint": "^9.37.0"
+  }
+}
