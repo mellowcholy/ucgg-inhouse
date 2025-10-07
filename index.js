@@ -5,7 +5,7 @@ const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
 
 // create client
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
 // load commands
 client.commands = new Collection();
@@ -37,17 +37,20 @@ const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith('.j
 for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
 	const event = require(filePath);
+
+	console.log(filePath);
 	if (event.once) {
 		client.once(event.name, (...args) => event.execute(...args));
 	}
 	else {
 		client.on(event.name, (...args) => event.execute(...args));
 	}
+
+	console.log(`Event loaded: ${event.name}`);
 }
 
 // handle cooldowns
 client.cooldowns = new Collection();
-
 
 // login
 client.login(token);
