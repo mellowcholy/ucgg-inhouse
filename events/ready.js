@@ -7,14 +7,12 @@ module.exports = {
 		console.log(`Ready! Logged in as ${client.user.tag}`);
 
 		// setup inhouse queue screen
-		const container = require("../panels/queue.js").getContainer();
-
-		client.inhouseContainer = container;
+		// TODO: f
 
 		// send initial queue
 		const channel = client.channels.cache.get("1424956618361147432");
 		channel.send({
-			components: [container],
+			components: [client.panels.get("In-House Queue")()],
 			flags: MessageFlags.IsComponentsV2,
 			allowedMentions: { parse: [] },
 		}).then(msg => client.latestInhousePost = msg);

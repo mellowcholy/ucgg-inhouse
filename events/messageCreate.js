@@ -18,7 +18,7 @@ module.exports = {
 		}
 
 		message.channel.send({
-			components: [client.inhouseContainer],
+			components: [client.panels.get("In-House Queue")()],
 			flags: MessageFlags.IsComponentsV2,
 			allowedMentions: { parse: [] },
 		}).then(msg => lastMessage = msg);

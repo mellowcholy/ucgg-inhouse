@@ -1,6 +1,7 @@
 const { ContainerBuilder, ButtonStyle, ButtonBuilder } = require("discord.js");
 
 module.exports = {
+	name: "In-House Queue",
 	getContainer() {
 		const container = new ContainerBuilder()
 			.setAccentColor(0x0099ff)
@@ -65,7 +66,7 @@ module.exports = {
 			)
 			.addSeparatorComponents((separator) => separator)
 			// leave queue
-			.addActionRowComponents((actionRow) => actionRow.setComponents(new ButtonBuilder().setCustomId('leave').setLabel('Leave Queue').setStyle(ButtonStyle.Danger)),
+			.addActionRowComponents((actionRow) => actionRow.setComponents(new ButtonBuilder().setCustomId('leavequeue').setLabel('Leave Queue').setStyle(ButtonStyle.Danger)),
 			);
 
 		return container;
