@@ -1,8 +1,27 @@
-const { ContainerBuilder, ButtonStyle, ButtonBuilder } = require("discord.js");
+const { ContainerBuilder, ButtonStyle, ButtonBuilder, Collection } = require("discord.js");
 
 module.exports = {
 	name: "In-House Queue",
-	getContainer() {
+	getContainer(client) {
+		const queue = client.queue;
+
+		// strings
+		const rolePlayers = new Collection();
+		const rolePlayerCount = new Collection();
+
+		for (const key of queue.keys()) {
+			const roleQueue = queue.get(key);
+
+			let _string = "";
+			roleQueue.forEach(id => {
+				_string += "<@" + id + "> ";
+			});
+
+			rolePlayers.set(key, _string);
+			rolePlayerCount.set(key, roleQueue.length);
+		}
+
+		// panels
 		const container = new ContainerBuilder()
 			.setAccentColor(0x0099ff)
 			.addTextDisplayComponents((textDisplay) =>
@@ -12,7 +31,7 @@ module.exports = {
 			// top lane
 			.addSectionComponents((section) => section
 				.addTextDisplayComponents((textDisplay) =>
-					textDisplay.setContent('Top Lane: 0/2\n<@259167676902014987>,<@1424621192819769396>'),
+					textDisplay.setContent(`Top Lane: ${rolePlayerCount.get("Top")}/2\n${rolePlayers.get("Top")}`),
 				)
 				.setButtonAccessory((button) =>
 					button.setCustomId('joinTop').setLabel('Join Top').setStyle(ButtonStyle.Secondary),
@@ -21,7 +40,7 @@ module.exports = {
 			// jg
 			.addSectionComponents((section) => section
 				.addTextDisplayComponents((textDisplay) =>
-					textDisplay.setContent('Jungle: 0/2'),
+					textDisplay.setContent(`Jungle: ${rolePlayerCount.get("Jungle")}/2\n${rolePlayers.get("Jungle")}`),
 				)
 				.setButtonAccessory((button) =>
 					button.setCustomId('joinJg').setLabel('Join Jungle').setStyle(ButtonStyle.Secondary),
@@ -30,7 +49,7 @@ module.exports = {
 			// mid
 			.addSectionComponents((section) => section
 				.addTextDisplayComponents((textDisplay) =>
-					textDisplay.setContent('Mid Lane: 0/2'),
+					textDisplay.setContent(`Mid Lane: ${rolePlayerCount.get("Mid")}/2\n${rolePlayers.get("Mid")}`),
 				)
 				.setButtonAccessory((button) =>
 					button.setCustomId('joinMid').setLabel('Join Mid').setStyle(ButtonStyle.Secondary),
@@ -39,7 +58,7 @@ module.exports = {
 			// bot
 			.addSectionComponents((section) => section
 				.addTextDisplayComponents((textDisplay) =>
-					textDisplay.setContent('Bot Lane: 0/2'),
+					textDisplay.setContent(`Bot Lane: ${rolePlayerCount.get("Bot")}/2\n${rolePlayers.get("Bot")}`),
 				)
 				.setButtonAccessory((button) =>
 					button.setCustomId('joinBot').setLabel('Join Bot').setStyle(ButtonStyle.Secondary),
@@ -48,7 +67,7 @@ module.exports = {
 			// sup
 			.addSectionComponents((section) => section
 				.addTextDisplayComponents((textDisplay) =>
-					textDisplay.setContent('Support: 0/2'),
+					textDisplay.setContent(`Support: ${rolePlayerCount.get("Support")}/2\n${rolePlayers.get("Support")}`),
 				)
 				.setButtonAccessory((button) =>
 					button.setCustomId('joinSup').setLabel('Join Support').setStyle(ButtonStyle.Secondary),
@@ -58,7 +77,7 @@ module.exports = {
 			// fill
 			.addSectionComponents((section) => section
 				.addTextDisplayComponents((textDisplay) =>
-					textDisplay.setContent('Fill: 0/10'),
+					textDisplay.setContent(`Fill: ${rolePlayerCount.get("Fill")}/10\n${rolePlayers.get("Fill")}`),
 				)
 				.setButtonAccessory((button) =>
 					button.setCustomId('joinFill').setLabel('Join Fill').setStyle(ButtonStyle.Secondary),

@@ -1,7 +1,7 @@
 // Require the necessary discord.js classes
 const fs = require("node:fs");
 const path = require("node:path");
-const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, MessageFlags } = require('discord.js');
 const { token } = require('./config.json');
 
 // create client
@@ -74,6 +74,40 @@ for (const file of eventFiles) {
 
 // handle cooldowns
 client.cooldowns = new Collection();
+
+// random other functions
+client.RefreshInHousePost = function() {
+	const channel = client.channels.cache.get("1424956618361147432");
+
+	if (client.latestInhousePost != null) {
+		client.latestInhousePost.delete();
+	}
+
+	channel.send({
+		components: [client.panels.get("In-House Queue")(client)],
+		flags: MessageFlags.IsComponentsV2,
+		allowedMentions: { parse: [] },
+	}).then(msg => client.latestInhousePost = msg);
+};
+
+client.JoinQueue = function(userId, position) {
+	const queue = client.queue;
+	const queuePos = queue.get(position);
+
+	for (const key of queue.keys()) {
+		const currentQueue = queue.get(key);
+		const isUserId = (v) => v == userId;
+		const found = currentQueue.findIndex(isUserId);
+
+		if (found == -1) { continue; }
+		if (key == position) { return 0; } // you are already queing for this role
+
+		currentQueue.splice(found, 1);
+	}
+
+	queuePos.push(userId);
+	return 1;
+};
 
 // login
 client.login(token);

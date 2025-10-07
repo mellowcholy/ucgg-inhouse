@@ -1,4 +1,4 @@
-const { Events, MessageFlags } = require("discord.js");
+const { Events, Collection } = require("discord.js");
 
 module.exports = {
 	name: Events.ClientReady,
@@ -6,15 +6,16 @@ module.exports = {
 	execute(client) {
 		console.log(`Ready! Logged in as ${client.user.tag}`);
 
-		// setup inhouse queue screen
-		// TODO: f
+		// setup queue
+		client.queue = new Collection();
+		client.queue.set("Top", new Array());
+		client.queue.set("Jungle", new Array());
+		client.queue.set("Mid", new Array());
+		client.queue.set("Bot", new Array());
+		client.queue.set("Support", new Array());
+		client.queue.set("Fill", new Array());
 
 		// send initial queue
-		const channel = client.channels.cache.get("1424956618361147432");
-		channel.send({
-			components: [client.panels.get("In-House Queue")()],
-			flags: MessageFlags.IsComponentsV2,
-			allowedMentions: { parse: [] },
-		}).then(msg => client.latestInhousePost = msg);
+		client.RefreshInHousePost();
 	},
 };
