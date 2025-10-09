@@ -4,12 +4,12 @@ module.exports = {
 	run(client) {
 		// setup queue
 		client.queue = new Collection([
-			["Top", new Array()],
-			["Jungle", new Array()],
-			["Mid", new Array()],
-			["Bot", new Array()],
-			["Support", new Array()],
-			["Fill", new Array()],
+			["Top", new Array("1", "2")],
+			["Jungle", new Array("3", "4")],
+			["Mid", new Array("5")],
+			["Bot", new Array("6")],
+			["Support", new Array("7", "8")],
+			["Fill", new Array("9")],
 		]);
 
 		// create inhouse post func
@@ -25,8 +25,6 @@ module.exports = {
 				flags: MessageFlags.IsComponentsV2,
 				allowedMentions: { parse: [] },
 			}).then(msg => client.latestInhousePost = msg);
-
-			CheckQueuePop();
 		};
 
 		// create join queue func
@@ -47,6 +45,8 @@ module.exports = {
 
 			queuePos.push(userId);
 
+			CheckQueuePop();
+
 			return 1;
 		};
 
@@ -61,7 +61,7 @@ module.exports = {
 				count += val;
 			}
 
-			if (count == 1) {
+			if (count == 10) {
 				QueuePop();
 			}
 		}
@@ -109,7 +109,7 @@ module.exports = {
 			match.set("number", 1);
 
 			// make text channel and vcs
-			const category = client.channels.cache.get("1425074429297168516");
+			const category = client.channels.cache.get("1425744453263425547");
 			const guild = category.guild;
 
 			const textChannel = await guild.channels.create({

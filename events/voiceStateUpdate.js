@@ -36,7 +36,7 @@ module.exports = {
 
 			match.get("waitingRoomPing").edit(pingString);
 
-			if (waitingOn.length == 0) { client.BeginMatch(); }
+			if (waitingOn.length == 9) { client.BeginMatch(match); }
 		});
 	},
 };
