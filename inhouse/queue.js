@@ -25,6 +25,8 @@ module.exports = {
 				flags: MessageFlags.IsComponentsV2,
 				allowedMentions: { parse: [] },
 			}).then(msg => client.latestInhousePost = msg);
+
+			CheckQueuePop();
 		};
 
 		// create join queue func
@@ -32,7 +34,6 @@ module.exports = {
 			const queue = client.queue;
 			const queuePos = queue.get(position);
 
-			/* TODO: RE-ENABLE THIS
 			for (const key of queue.keys()) {
 				const currentQueue = queue.get(key);
 				const isUserId = (v) => v == userId;
@@ -42,11 +43,10 @@ module.exports = {
 				if (key == position) { return 0; } // you are already queing for this role
 
 				currentQueue.splice(found, 1);
-			}*/
+			}
 
 			queuePos.push(userId);
 
-			CheckQueuePop();
 			return 1;
 		};
 
@@ -81,13 +81,16 @@ module.exports = {
 			]));
 
 			match.set("waitingOn", new Array());
+			match.set("players", new Array());
 
 			let pingString = "A match is ready. Please join the match voice channel: ";
+
+			const matchWaiting = match.get("waitingOn");
+			const players = match.get("players");
 
 			for (const key of queue.keys()) {
 				const queuePos = queue.get(key);
 				const matchPos = match.get("positions").get(key);
-				const matchWaiting = match.get("waitingOn");
 				const num = key == "Fill" ? queuePos.length : Math.min(2, queuePos.length);
 
 				for (let i = 0; i < num; i++) {
@@ -97,6 +100,7 @@ module.exports = {
 
 					matchPos.push(player);
 					matchWaiting.push(player);
+					players.push(player);
 				}
 			}
 
@@ -129,8 +133,6 @@ module.exports = {
 			match.set("waitingRoomPing", waitingRoomPing);
 
 			client.matches.push(match);
-
-			console.log(match);
 		}
 	},
 };
