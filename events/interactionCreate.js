@@ -67,7 +67,7 @@ module.exports = {
 			}
 
 			try {
-				await button.execute(interaction);
+				await button(interaction);
 			}
 			catch (error) {
 				console.error(error);

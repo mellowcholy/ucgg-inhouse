@@ -1,4 +1,4 @@
-const { ContainerBuilder, ButtonStyle, ButtonBuilder, Collection } = require("discord.js");
+const { ContainerBuilder, ButtonStyle, ButtonBuilder, Collection, MessageFlags } = require("discord.js");
 
 module.exports = {
 	name: "In-House Queue",
@@ -43,7 +43,7 @@ module.exports = {
 					textDisplay.setContent(`Jungle: ${rolePlayerCount.get("Jungle")}/2\n${rolePlayers.get("Jungle")}`),
 				)
 				.setButtonAccessory((button) =>
-					button.setCustomId('joinJg').setLabel('Join Jungle').setStyle(ButtonStyle.Secondary),
+					button.setCustomId('joinJungle').setLabel('Join Jungle').setStyle(ButtonStyle.Secondary),
 				),
 			)
 			// mid
@@ -70,7 +70,7 @@ module.exports = {
 					textDisplay.setContent(`Support: ${rolePlayerCount.get("Support")}/2\n${rolePlayers.get("Support")}`),
 				)
 				.setButtonAccessory((button) =>
-					button.setCustomId('joinSup').setLabel('Join Support').setStyle(ButtonStyle.Secondary),
+					button.setCustomId('joinSupport').setLabel('Join Support').setStyle(ButtonStyle.Secondary),
 				),
 			)
 			.addSeparatorComponents((separator) => separator)
@@ -89,5 +89,64 @@ module.exports = {
 			);
 
 		return container;
+	},
+	async setupButtons(client) {
+		const positions = new Array("Top", "Jungle", "Mid", "Bot", "Support", "Fill");
+
+		positions.forEach(pos => {
+			client.buttons.set("join" + pos, async (interaction) => {
+				const result = client.JoinQueue(interaction.user.id, pos);
+
+				switch (result) {
+				case 0:
+					await interaction.reply({
+						content: `You are already queued for ${pos}.`,
+						flags: MessageFlags.Ephemeral,
+					});
+					return;
+
+				case 1:
+					await interaction.reply({
+						content: `You have succesfully joined ${pos}.`,
+						flags: MessageFlags.Ephemeral,
+					}).then(client.RefreshInHousePost());
+					return;
+				}
+			});
+		});
+
+		client.buttons.set("leavequeue", LeaveQueue);
+		async function LeaveQueue(interaction) {
+			const userId = interaction.user.id;
+
+			const queue = client.queue;
+
+			let bool = false;
+
+			queue.each(async val => {
+				const isUserId = (v) => v == userId;
+				const found = val.findIndex(isUserId);
+
+				if (found == -1) { return; }
+
+				val.splice(found, 1);
+
+				bool = true;
+
+				await interaction.reply({
+					content: 'You have left the queue.',
+					flags: MessageFlags.Ephemeral,
+				}).then(client.RefreshInHousePost());
+
+				return;
+			});
+
+			if (bool) { return; }
+
+			await interaction.reply({
+				content: 'You are not in the queue.',
+				flags: MessageFlags.Ephemeral,
+			});
+		}
 	},
 };

@@ -32,6 +32,7 @@ for (const folder of commandFolders) {
 
 // load panels
 client.panels = new Collection();
+client.buttons = new Collection();
 
 const panelsPath = path.join(__dirname, 'panels');
 const panelsFiles = fs.readdirSync(panelsPath).filter((file) => file.endsWith('.js'));
@@ -41,19 +42,7 @@ for (const file of panelsFiles) {
 	const panel = require(filePath);
 
 	client.panels.set(panel.name, panel.getContainer);
-}
-
-// load buttons
-client.buttons = new Collection();
-
-const buttonsPath = path.join(__dirname, 'buttons');
-const buttonsFiles = fs.readdirSync(buttonsPath).filter((file) => file.endsWith('.js'));
-
-for (const file of buttonsFiles) {
-	const filePath = path.join(buttonsPath, file);
-	const button = require(filePath);
-
-	client.buttons.set(button.name, button);
+	panel.setupButtons(client);
 }
 
 // load events
