@@ -5,6 +5,8 @@ module.exports = {
 	async execute(interaction) {
 		const client = interaction.client;
 
+		interaction.deferReply();
+
 		const result = client.JoinQueue(interaction.user.id, "Bot");
 
 		switch (result) {
