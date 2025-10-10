@@ -106,7 +106,8 @@ module.exports = {
 
 			// populate match with data
 			// TODO: peristent match numbers
-			match.set("number", 1);
+			const matchId = 1;
+			match.set("number", matchId);
 
 			// make text channel and vcs
 			const category = client.channels.cache.get("1425744453263425547");
@@ -118,6 +119,11 @@ module.exports = {
 				parent: category,
 			});
 
+			// alert players of match
+			const waitingRoomPing = await textChannel.send(pingString);
+
+			match.set("waitingRoomPing", waitingRoomPing);
+
 			const waitingRoom = await guild.channels.create({
 				name: `Match #${match.get("number")}`,
 				type: ChannelType.GuildVoice,
@@ -127,12 +133,7 @@ module.exports = {
 			match.set("textChannel", textChannel);
 			match.set("waitingRoom", waitingRoom);
 
-			// alert players of match
-			const waitingRoomPing = await textChannel.send(pingString);
-
-			match.set("waitingRoomPing", waitingRoomPing);
-
-			client.matches.push(match);
+			client.matches.set(matchId, match);
 		}
 	},
 };

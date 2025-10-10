@@ -42,7 +42,7 @@ for (const file of panelsFiles) {
 	const panel = require(filePath);
 
 	client.panels.set(panel.name, panel.getContainer);
-	panel.setupButtons(client);
+	// panel.setupButtons(client);
 }
 
 // load events

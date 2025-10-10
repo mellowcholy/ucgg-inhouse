@@ -1,13 +1,17 @@
-const { Collection } = require("discord.js");
+const { Collection, MessageFlags } = require("discord.js");
 
 module.exports = {
 	run(client) {
-		client.matches = new Array();
+		client.matches = new Collection();
 
 		client.BeginMatch = function(match) {
-			console.log("let the games begin");
+			const teams = BalanceTeams(match);
 
-			BalanceTeams(match);
+			match.set("teams", teams);
+
+			console.log(match);
+
+			WheelVote(match);
 		};
 
 		const mmrs = new Collection([
@@ -218,9 +222,59 @@ module.exports = {
 				}
 			}
 
-			console.log(best);
-
 			return best;
+		}
+
+		client.refreshVoteWheel = function(match) {
+			const wheelVoteMessage = match.get("wheelVoteMsg");
+
+
+			wheelVoteMessage.edit({
+				components: [client.panels.get("Vote Wheel")(client, match)],
+				flags: MessageFlags.IsComponentsV2,
+			});
+		};
+
+		client.wheelResultYes = function(match) {
+			const channel = match.get("textChannel");
+			const wheelVoteMessage = match.get("wheelVoteMsg");
+
+			wheelVoteMessage.delete();
+
+			// TODO: wheel spin
+			channel.send(`The random modifier for this game is: **Gbay gets karthus!**`);
+
+			MoveToVoice();
+		};
+
+		client.wheelResultNo = function(match) {
+			const channel = match.get("textChannel");
+			const wheelVoteMessage = match.get("wheelVoteMsg");
+
+			wheelVoteMessage.delete();
+
+			channel.send("The wheel will not be spun.");
+
+			MoveToVoice();
+		};
+
+		function WheelVote(match) {
+			// vote for wheel spin.
+			// if passes, spin wheel. -> MoveToVoice()
+			// if not, MoveToVoice()
+			match.set("wheelVotesYes", new Array());
+			match.set("wheelVotesNo", new Array());
+
+			const channel = match.get("textChannel");
+
+			channel.send({
+				components: [client.panels.get("Vote Wheel")(client, match)],
+				flags: MessageFlags.IsComponentsV2,
+			}).then(msg => match.set("wheelVoteMsg", msg));
+		}
+
+		function MoveToVoice() {
+			// post teams in match txt channel -> create teama and teamb vc --> move teams to vc --> delete waiting room vc --> have vote winner post in match txt
 		}
 	},
 };
