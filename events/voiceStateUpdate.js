@@ -2,14 +2,16 @@ const { Events } = require("discord.js");
 
 module.exports = {
 	name: Events.VoiceStateUpdate,
-	execute(oldState, newState) {
+	execute(_, newState) {
 		const client = newState.client;
 		const person = newState.member.id;
 
 		client.matches.forEach(match => {
 			const waitingOn = match.get("waitingOn");
+			const waitingRoomPing = match.get("waitingRoomPing");
 			const players = match.get("players");
 
+			if (waitingOn == null || waitingRoomPing == null) { return; }
 			if (waitingOn.length == 0) { return; } // no people left
 
 			if (!players.includes(person)) { return; } // not in the queue
@@ -22,7 +24,7 @@ module.exports = {
 					waitingOn.splice(playerIndex, 1);
 				}
 			}
-			else {
+			else if (playerIndex == -1) {
 				// left match vc
 				waitingOn.push(person);
 			}
@@ -34,7 +36,7 @@ module.exports = {
 				pingString += `<@${ply}> `;
 			});
 
-			match.get("waitingRoomPing").edit(pingString);
+			waitingRoomPing.edit(pingString).catch(error => console.error(error));
 
 			if (waitingOn.length == 9) { client.BeginMatch(match); }
 		});

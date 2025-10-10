@@ -1,4 +1,4 @@
-const { Collection, MessageFlags } = require("discord.js");
+const { Collection, MessageFlags, ChannelType } = require("discord.js");
 
 module.exports = {
 	run(client) {
@@ -8,8 +8,6 @@ module.exports = {
 			const teams = BalanceTeams(match);
 
 			match.set("teams", teams);
-
-			console.log(match);
 
 			WheelVote(match);
 		};
@@ -228,40 +226,39 @@ module.exports = {
 		client.refreshVoteWheel = function(match) {
 			const wheelVoteMessage = match.get("wheelVoteMsg");
 
-
 			wheelVoteMessage.edit({
 				components: [client.panels.get("Vote Wheel")(client, match)],
 				flags: MessageFlags.IsComponentsV2,
 			});
 		};
 
-		client.wheelResultYes = function(match) {
+		client.wheelResult = function(match, result) {
 			const channel = match.get("textChannel");
 			const wheelVoteMessage = match.get("wheelVoteMsg");
 
 			wheelVoteMessage.delete();
 
-			// TODO: wheel spin
-			channel.send(`The random modifier for this game is: **Gbay gets karthus!**`);
+			if (result) {
+				// TODO: wheel spin
+				channel.send(`The random modifier for this game is: **Gbay gets karthus!**`);
+			}
+			else {
+				channel.send("The wheel will not be spun.");
+			}
 
-			MoveToVoice();
-		};
-
-		client.wheelResultNo = function(match) {
-			const channel = match.get("textChannel");
-			const wheelVoteMessage = match.get("wheelVoteMsg");
-
-			wheelVoteMessage.delete();
-
-			channel.send("The wheel will not be spun.");
-
-			MoveToVoice();
+			MoveToVoice(match);
 		};
 
 		function WheelVote(match) {
+			// cleanup match data
+			const ping = match.get("waitingRoomPing");
+			if (ping != null) {
+				ping.delete();
+			}
+			match.delete("waitingRoomPing");
+			match.delete("waitingOn");
+
 			// vote for wheel spin.
-			// if passes, spin wheel. -> MoveToVoice()
-			// if not, MoveToVoice()
 			match.set("wheelVotesYes", new Array());
 			match.set("wheelVotesNo", new Array());
 
@@ -273,8 +270,109 @@ module.exports = {
 			}).then(msg => match.set("wheelVoteMsg", msg));
 		}
 
-		function MoveToVoice() {
-			// post teams in match txt channel -> create teama and teamb vc --> move teams to vc --> delete waiting room vc --> have vote winner post in match txt
+		async function MoveToVoice(match) {
+			// clean up wheel data
+			match.delete("wheelVotesYes");
+			match.delete("wheelVotesNo");
+			match.delete("wheelvote");
+			match.delete("wheelVoteMsg");
+
+			// vote for wheel spin.
+			match.set("winnerVotesBlue", new Array());
+			match.set("winnerVotesRed", new Array());
+
+			const channel = match.get("textChannel");
+
+			channel.send({
+				components: [client.panels.get("Teams and Vote Winner")(client, match)],
+				flags: MessageFlags.IsComponentsV2,
+				allowedMentions: { parse: [] },
+			}).then(msg => match.set("winnerVoteMsg", msg));
+
+			// create team a and team b vc
+			const category = client.channels.cache.get("1425744453263425547");
+			const guild = category.guild;
+
+			const blueVc = await guild.channels.create({
+				name: `Match #${match.get("number")} - Blue Side`,
+				type: ChannelType.GuildVoice,
+				parent: category,
+			});
+			match.set("blueVc", blueVc);
+
+			const redVc = await guild.channels.create({
+				name: `Match #${match.get("number")} - Red Side`,
+				type: ChannelType.GuildVoice,
+				parent: category,
+			});
+			match.set("redVc", redVc);
+
+			// move people into there
+			const teams = match.get("teams");
+
+			for (const [, player] of teams.blueSide) {
+				const id = Object.keys(player)[0];
+				const member = guild.members.cache.get(id) || null;
+
+				if (member == null) { continue; }
+
+				member.voice.setChannel(blueVc).catch(error => console.error(`Error moving: ${error}`));
+			}
+
+			for (const [, player] of teams.redSide) {
+				const id = Object.keys(player)[0];
+				const member = guild.members.cache.get(id) || null;
+
+				if (member == null) { continue; }
+
+				member.voice.setChannel(redVc).catch(error => console.error(`Error moving: ${error}`));
+			}
+
+			// delete waiting room
+			const waitingRoom = match.get("waitingRoom");
+			setTimeout(async () => waitingRoom.delete(), 5000);
+			match.delete("waitingRoom");
 		}
+
+		client.winnerResult = function(match, result) {
+			// post results
+			const channel = client.channels.cache.get("1426080377856065616");
+
+			channel.send({
+				components: [client.panels.get("Results")(match, result)],
+				flags: MessageFlags.IsComponentsV2,
+				allowedMentions: { parse: [] },
+			});
+
+			// delete vc and text and other data
+			match.delete("positions");
+			const textChannel = match.get("textChannel");
+			textChannel.delete();
+
+			match.delete("textChannel");
+			match.delete("winnerVotesBlue");
+			match.delete("winnerVotesRed");
+			match.delete("winnervote");
+
+			const blueVc = match.get("blueVc");
+			blueVc.delete();
+			match.delete("blueVc");
+
+			const redVc = match.get("redVc");
+			redVc.delete();
+			match.delete("redVc");
+
+			match.delete("winnerVoteMsg");
+		};
+
+		client.refreshWinnerVote = function(match) {
+			const winnerVoteMessage = match.get("winnerVoteMsg");
+
+			winnerVoteMessage.edit({
+				components: [client.panels.get("Teams and Vote Winner")(client, match)],
+				flags: MessageFlags.IsComponentsV2,
+				allowedMentions: { parse: [] },
+			});
+		};
 	},
 };

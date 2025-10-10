@@ -5,14 +5,17 @@ module.exports = {
 	getContainer(client, match) {
 		const matchId = match.get("number");
 
-		const wheelVotesYes = match.get("wheelVotesYes");
-		const wheelVotesNo = match.get("wheelVotesNo");
+		let wheelVotesYes = match.get("wheelVotesYes");
+		let wheelVotesNo = match.get("wheelVotesNo");
 
 		// buttons
 		async function setupButtons() {
 			client.buttons.set('wheelvoteyes_' + matchId, VoteYes);
 			async function VoteYes(interaction) {
 				const userId = interaction.user.id;
+
+				wheelVotesYes = match.get("wheelVotesYes");
+				wheelVotesNo = match.get("wheelVotesNo");
 
 				if (match.get("players").includes(userId)) {
 					if (wheelVotesYes.includes(userId)) {
@@ -39,7 +42,7 @@ module.exports = {
 
 					// TODO: change back to 6
 					if (wheelVotesYes.length == 1) {
-						client.wheelResultYes(match);
+						client.wheelResult(match, true);
 					}
 					else {
 						client.refreshVoteWheel(match);
@@ -56,6 +59,9 @@ module.exports = {
 			client.buttons.set('wheelvoteno_' + matchId, VoteNo);
 			async function VoteNo(interaction) {
 				const userId = interaction.user.id;
+
+				wheelVotesYes = match.get("wheelVotesYes");
+				wheelVotesNo = match.get("wheelVotesNo");
 
 				if (match.get("players").includes(userId)) {
 					if (wheelVotesNo.includes(userId)) {
@@ -82,7 +88,7 @@ module.exports = {
 
 					// TODO: change back to 5
 					if (wheelVotesNo.length == 1) {
-						client.wheelResultNo(match);
+						client.wheelResult(match, false);
 					}
 					else {
 						client.refreshVoteWheel(match);
