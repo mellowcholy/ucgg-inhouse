@@ -1,4 +1,4 @@
-const { MessageFlags, Collection, ChannelType } = require('discord.js');
+const { MessageFlags, Collection, ChannelType, time, TimestampStyles } = require('discord.js');
 
 module.exports = {
 	run(client) {
@@ -114,6 +114,12 @@ module.exports = {
 				}
 			}
 
+			const date = new Date();
+			date.setSeconds(date.getSeconds() + 180);
+			const timeString = time(date, TimestampStyles.RelativeTime);
+
+			pingString += `. If not everyone has joined ${timeString}, the match will be cancelled.`;
+
 			// populate match with data
 			// TODO: peristent match numbers
 			const matchId = 1;
@@ -143,7 +149,7 @@ module.exports = {
 			match.set("textChannel", textChannel);
 			match.set("waitingRoom", waitingRoom);
 
-			setTimeout(() => client.cancelAfterDelay(matchId), 5000);
+			setTimeout(() => client.cancelAfterDelay(matchId), 180 * 1000);
 			client.matches.set(matchId, match);
 		}
 	},

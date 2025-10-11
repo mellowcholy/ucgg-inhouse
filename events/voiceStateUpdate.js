@@ -1,4 +1,4 @@
-const { Events } = require("discord.js");
+const { Events, time, TimestampStyles } = require("discord.js");
 
 module.exports = {
 	name: Events.VoiceStateUpdate,
@@ -36,9 +36,14 @@ module.exports = {
 				pingString += `<@${ply}> `;
 			});
 
+			const date = new Date(waitingRoomPing.createdTimestamp + (180 * 1000));
+			const timeString = time(date, TimestampStyles.RelativeTime);
+
+			pingString += `. If not everyone has joined ${timeString}, the match will be cancelled.`;
+
 			waitingRoomPing.edit(pingString).catch(error => console.error(error));
 
-			if (waitingOn.length == 9) { client.BeginMatch(match); }
+			if (waitingOn.length == 8) { client.BeginMatch(match); }
 		});
 	},
 };

@@ -9,7 +9,9 @@
   "author": "mellowcholy",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^14.22.1"
+    "@keyv/sqlite": "^4.0.6",
+    "discord.js": "^14.22.1",
+    "keyv": "^5.5.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
