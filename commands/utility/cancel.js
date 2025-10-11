@@ -18,13 +18,13 @@ module.exports = {
 			await interaction.editReply({
 				content: `Match #${number} does not exist!`,
 				flags: MessageFlags.Ephemeral,
-			}).catch();
+			}).catch(console.error);
 			return;
 
 		case 1:
 			await interaction.editReply({
 				content: `${interaction.user.username} has cancelled Match #${number}`,
-			}).catch();
+			}).catch(console.error);
 			return;
 		}
 	},

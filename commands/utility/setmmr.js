@@ -47,7 +47,7 @@ module.exports = {
 		await interaction.editReply({
 			content: `<@${target.id}>'s MMR for: ${role} has been set to ${mmr}.`,
 			flags: MessageFlags.Ephemeral,
-		}).catch();
+		}).catch(console.error);
 		return;
 	},
 };

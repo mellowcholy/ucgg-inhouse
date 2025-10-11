@@ -307,7 +307,7 @@ module.exports = {
 
 				if (member == null) { continue; }
 
-				member.voice.setChannel(blueVc).catch();
+				member.voice.setChannel(blueVc).catch(console.error);
 			}
 
 			for (const [, player] of teams.redSide) {
@@ -316,7 +316,7 @@ module.exports = {
 
 				if (member == null) { continue; }
 
-				member.voice.setChannel(redVc).catch();
+				member.voice.setChannel(redVc).catch(console.error);
 			}
 
 			// delete waiting room
