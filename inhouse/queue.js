@@ -143,6 +143,7 @@ module.exports = {
 			match.set("textChannel", textChannel);
 			match.set("waitingRoom", waitingRoom);
 
+			setTimeout(() => client.cancelAfterDelay(matchId), 5000);
 			client.matches.set(matchId, match);
 		}
 	},

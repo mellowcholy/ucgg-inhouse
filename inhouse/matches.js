@@ -92,6 +92,48 @@ module.exports = {
 			])],
 		]);
 
+		client.cancelMatch = function(number) {
+			const match = client.matches.get(number);
+
+			if (match == null) { return 0; }
+
+			// delete text channel
+			const textChannel = match.get("textChannel");
+			if (textChannel != null) {
+				textChannel.delete();
+			}
+
+			// delete vcs
+			const waitingRoom = match.get("waitingRoom");
+			if (waitingRoom != null) {
+				waitingRoom.delete();
+			}
+
+			const blueVc = match.get("blueVc");
+			if (blueVc != null) {
+				blueVc.delete();
+			}
+
+			const redVc = match.get("redVc");
+			if (redVc != null) {
+				redVc.delete();
+			}
+
+			client.matches.delete(number);
+
+			return 1;
+		};
+
+		client.cancelAfterDelay = function(number) {
+			const match = client.matches.get(number);
+
+			if (match == null) { return; }
+			if (match.get("waitingRoomPing") == null) { return; }
+
+			// not everyone joined vc after delay. cancel match.
+			client.cancelMatch(number);
+		};
+
 		function BalanceTeams(match) {
 
 			const players = match.get("positions");
