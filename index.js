@@ -1,4 +1,6 @@
 // Require the necessary discord.js classes
+const { Keyv } = require("keyv");
+const { KeyvSqlite } = require('@keyv/sqlite');
 const fs = require("node:fs");
 const path = require("node:path");
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
@@ -6,6 +8,7 @@ const { token } = require('./config.json');
 
 // create client
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates] });
+client.keyv = new Keyv(new KeyvSqlite("./caitlyn.db"));
 
 // load commands
 client.commands = new Collection();
