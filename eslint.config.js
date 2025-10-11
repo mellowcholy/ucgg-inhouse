@@ -42,7 +42,6 @@ module.exports = [
 				},
 			],
 			'space-in-parens': 'error',
-			'space-infix-ops': 'error',
 			'space-unary-ops': 'error',
 			'spaced-comment': 'error',
 			yoda: 'error',

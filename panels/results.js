@@ -8,21 +8,39 @@ module.exports = {
 		const teams = match.get("teams");
 
 		// setup blueside string
-		let blueSideString = `**Blue Side - [${teams.avgBlue}]**\n`;
+		let blueSideString = winner ? "__" : "";
+		blueSideString += `**Blue Side - [${teams.avgBlue}]**`;
+		blueSideString += winner ? "__\n" : "\n";
 		for (const [role, player] of teams.blueSide) {
 			const [id, mmr] = Object.entries(player)[0];
 
-			const _string = `${role}: <@${id}> - [${mmr}]\n`;
+			const _string = `${role}: <@${id}>: [${mmr}]`;
 			blueSideString += _string;
+
+			if (winner) {
+				blueSideString += ` -> [${mmr + 20}]\n`;
+			}
+			else {
+				blueSideString += ` -> [${mmr - 20}]\n`;
+			}
 		}
 
 		// setup redside string
-		let redSideString = `**Red Side - [${teams.avgRed}]**\n`;
+		let redSideString = winner ? "" : "__";
+		redSideString += `**Red Side - [${teams.avgRed}]**`;
+		redSideString += winner ? "\n" : "__\n";
 		for (const [role, player] of teams.redSide) {
 			const [id, mmr] = Object.entries(player)[0];
 
-			const _string = `${role}: <@${id}> - [${mmr}]\n`;
+			const _string = `${role}: <@${id}>: [${mmr}]`;
 			redSideString += _string;
+
+			if (winner) {
+				redSideString += ` -> [${mmr - 20}]\n`;
+			}
+			else {
+				redSideString += ` -> [${mmr + 20}]\n`;
+			}
 		}
 
 		let accentColour = 0xac9cff;

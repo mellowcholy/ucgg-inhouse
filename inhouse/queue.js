@@ -122,7 +122,7 @@ module.exports = {
 
 			// populate match with data
 			// TODO: peristent match numbers
-			const matchId = 1;
+			const matchId = await client.keyv.get("matchNum") + 1 || 1;
 			match.set("number", matchId);
 
 			// make text channel and vcs

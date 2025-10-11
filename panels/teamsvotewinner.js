@@ -42,7 +42,7 @@ module.exports = {
 
 					// TODO: change back to 6
 					if (winnerVotesBlue.length == 1) {
-						client.winnerResult(match, true);
+						await client.winnerResult(match, true);
 					}
 					else {
 						client.refreshWinnerVote(match);
@@ -88,7 +88,7 @@ module.exports = {
 
 					// TODO: change back to 6
 					if (winnerVotesRed.length == 1) {
-						client.winnerResult(match, false);
+						await client.winnerResult(match, false);
 					}
 					else {
 						client.refreshWinnerVote(match);

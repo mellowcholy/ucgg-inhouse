@@ -4,93 +4,13 @@ module.exports = {
 	run(client) {
 		client.matches = new Collection();
 
-		client.BeginMatch = function(match) {
-			const teams = BalanceTeams(match);
+		client.BeginMatch = async function(match) {
+			const teams = await BalanceTeams(match);
 
 			match.set("teams", teams);
 
 			WheelVote(match);
 		};
-
-		const mmrs = new Collection([
-			["default", new Collection([
-				["Top", 1000],
-				["Jungle", 1000],
-				["Mid", 1000],
-				["Bot", 1000],
-				["Support", 1000],
-			])],
-			["259167676902014987", new Collection([
-				["Top", 500],
-				["Jungle", 1000],
-				["Mid", 2000],
-				["Bot", 1361],
-				["Support", 2000],
-			])],
-			["1", new Collection([
-				["Top", 2350],
-				["Jungle", 1000],
-				["Mid", 2000],
-				["Bot", 2400],
-				["Support", 2000],
-			])],
-			["2", new Collection([
-				["Top", 2456],
-				["Jungle", 1000],
-				["Mid", 2000],
-				["Bot", 2400],
-				["Support", 2000],
-			])],
-			["3", new Collection([
-				["Top", 500],
-				["Jungle", 2106],
-				["Mid", 2000],
-				["Bot", 2400],
-				["Support", 2000],
-			])],
-			["4", new Collection([
-				["Top", 500],
-				["Jungle", 2292],
-				["Mid", 2000],
-				["Bot", 2400],
-				["Support", 2000],
-			])],
-			["5", new Collection([
-				["Top", 500],
-				["Jungle", 1000],
-				["Mid", 2721],
-				["Bot", 2400],
-				["Support", 2000],
-			])],
-			["6", new Collection([
-				["Top", 500],
-				["Jungle", 1000],
-				["Mid", 2000],
-				["Bot", 1332],
-				["Support", 2000],
-			])],
-			["7", new Collection([
-				["Top", 500],
-				["Jungle", 1000],
-				["Mid", 2000],
-				["Bot", 2400],
-				["Support", 1477],
-			])],
-			["8", new Collection([
-				["Top", 500],
-				["Jungle", 1000],
-				["Mid", 2000],
-				["Bot", 2400],
-				["Support", 618],
-			])],
-			["9", new Collection([
-				["Top", 500],
-				["Jungle", 1000],
-				["Mid", 2183],
-				["Bot", 2400],
-				["Support", 2000],
-			])],
-		]);
 
 		client.cancelMatch = function(number) {
 			const match = client.matches.get(number);
@@ -134,7 +54,28 @@ module.exports = {
 			client.cancelMatch(number);
 		};
 
-		function BalanceTeams(match) {
+		async function InitialisePlayer(id) {
+			const data = {};
+
+			data["wins"] = 0;
+			data["losses"] = 0;
+			data["points"] = 0;
+			data["mvps"] = 0;
+			data["items"] = new Array();
+			data["mmrs"] = {
+				"Top": 1000,
+				"Jungle": 1000,
+				"Mid": 1000,
+				"Bot": 1000,
+				"Support": 1000,
+			};
+
+			await client.keyv.set(id, data);
+
+			return data;
+		}
+
+		async function BalanceTeams(match) {
 
 			const players = match.get("positions");
 			const trials = 500;
@@ -146,12 +87,20 @@ module.exports = {
 				playerMMR.set(k, new Array());
 				const role = playerMMR.get(k);
 
-				v.forEach(player => {
-					const plyMMR = mmrs.get(player) || mmrs.get("default");
-					const mmr = k == "Fill" ? plyMMR : plyMMR.get(k);
+				// Use Promise.all to wait for all async gets to complete
+				const mmrData = await Promise.all(
+					v.map(async player => {
+						let data = await client.keyv.get(player);
+						if (!data) data = await InitialisePlayer(player);
 
-					role.push({ [player]: mmr });
-				});
+						const plyMMR = data["mmrs"];
+						const mmr = k == "Fill" ? plyMMR : plyMMR[k];
+
+						return { [player]: mmr };
+					}),
+				);
+
+				role.push(...mmrData);
 			}
 
 			function PickBestFill(role, fill) {
@@ -173,7 +122,7 @@ module.exports = {
 
 				const chosen = fill.splice(best, 1)[0];
 
-				return { [names[best]]: chosen[names[best]].get(role) };
+				return { [names[best]]: chosen[names[best]][role] };
 			}
 
 			function MakeTeams() {
@@ -229,7 +178,7 @@ module.exports = {
 					const diffBefore = Math.abs(totalBlue - totalRed);
 					const newBlue = totalBlue - a + b;
 					const newRed = totalRed - b + a;
-					const diffAfter = Math.abs(newBlue, newRed);
+					const diffAfter = Math.abs(newBlue - newRed);
 
 					if (diffAfter < diffBefore) {
 						const swap = blueSide.get(role);
@@ -376,7 +325,9 @@ module.exports = {
 			match.delete("waitingRoom");
 		}
 
-		client.winnerResult = function(match, result) {
+		client.winnerResult = async function(match, result) {
+			// result -> true = blue side | false -> red side
+
 			// post results
 			const channel = client.channels.cache.get("1426080377856065616");
 
@@ -407,8 +358,40 @@ module.exports = {
 			match.delete("winnerVoteMsg");
 
 			// TODO: save data here
-
 			const number = match.get("number");
+
+			const teams = match.get("teams");
+			const winner = result ? teams["blueSide"] : teams["redSide"];
+			const loser = result ? teams["redSide"] : teams["blueSide"];
+
+			await client.keyv.set("matchNum", number);
+
+			// winner
+			for (const [role, player] of winner) {
+				const [id] = Object.entries(player)[0];
+				const data = await client.keyv.get(id);
+
+				data["wins"]++;
+				data["points"] += 5;
+				data["mmrs"][role] += 20;
+
+				await client.keyv.set(id, data);
+			}
+
+			// loser
+			for (const [role, player] of loser) {
+				const [id] = Object.entries(player)[0];
+				const data = await client.keyv.get(id);
+
+				data["losses"]++;
+				data["points"] += 2;
+				data["mmrs"][role] -= 20;
+
+				data["mmrs"][role] = Math.max(0, data["mmrs"][role]);
+
+				await client.keyv.set(id, data);
+			}
+
 			client.matches.delete(number);
 		};
 

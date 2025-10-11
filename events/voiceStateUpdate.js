@@ -43,7 +43,8 @@ module.exports = {
 
 			waitingRoomPing.edit(pingString).catch(error => console.error(error));
 
-			if (waitingOn.length == 8) { client.BeginMatch(match); }
+			// TODO: set to 0
+			if (waitingOn.length == 9) { client.BeginMatch(match); }
 		});
 	},
 };
