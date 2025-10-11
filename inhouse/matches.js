@@ -54,7 +54,7 @@ module.exports = {
 			client.cancelMatch(number);
 		};
 
-		async function InitialisePlayer(id) {
+		client.InitialisePlayer = async function(id) {
 			const data = {};
 
 			data["wins"] = 0;
@@ -73,7 +73,7 @@ module.exports = {
 			await client.keyv.set(id, data);
 
 			return data;
-		}
+		};
 
 		async function BalanceTeams(match) {
 
@@ -91,7 +91,7 @@ module.exports = {
 				const mmrData = await Promise.all(
 					v.map(async player => {
 						let data = await client.keyv.get(player);
-						if (!data) data = await InitialisePlayer(player);
+						if (!data) data = await client.InitialisePlayer(player);
 
 						const plyMMR = data["mmrs"];
 						const mmr = k == "Fill" ? plyMMR : plyMMR[k];
@@ -307,7 +307,7 @@ module.exports = {
 
 				if (member == null) { continue; }
 
-				member.voice.setChannel(blueVc).catch(error => console.error(`Error moving: ${error}`));
+				member.voice.setChannel(blueVc).catch();
 			}
 
 			for (const [, player] of teams.redSide) {
@@ -316,7 +316,7 @@ module.exports = {
 
 				if (member == null) { continue; }
 
-				member.voice.setChannel(redVc).catch(error => console.error(`Error moving: ${error}`));
+				member.voice.setChannel(redVc).catch();
 			}
 
 			// delete waiting room

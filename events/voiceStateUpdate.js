@@ -41,7 +41,7 @@ module.exports = {
 
 			pingString += `. If not everyone has joined ${timeString}, the match will be cancelled.`;
 
-			waitingRoomPing.edit(pingString).catch(error => console.error(error));
+			waitingRoomPing.edit(pingString).catch();
 
 			// TODO: set to 0
 			if (waitingOn.length == 9) { client.BeginMatch(match); }
