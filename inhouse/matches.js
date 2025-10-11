@@ -115,7 +115,7 @@ module.exports = {
 
 				for (let i = 1; i < fill.length; i++) {
 
-					if (fill[i][names[i]].get(role) > fill[best][names[best]].get(role)) {
+					if (fill[i][names[i]][role] > fill[best][names[best]][role]) {
 						best = i;
 					}
 				}
@@ -231,7 +231,7 @@ module.exports = {
 
 			if (result) {
 				// TODO: wheel spin
-				channel.send(`The random modifier for this game is: **Gbay gets karthus!**`);
+				channel.send(`The random modifier for this game is: **(WAITING ON RHO)**`);
 			}
 			else {
 				channel.send("The wheel will not be spun.");
@@ -281,7 +281,7 @@ module.exports = {
 			}).then(msg => match.set("winnerVoteMsg", msg));
 
 			// create team a and team b vc
-			const category = client.channels.cache.get("1425744453263425547");
+			const category = client.channels.cache.get("1249690547413843991");
 			const guild = category.guild;
 
 			const blueVc = await guild.channels.create({
@@ -329,7 +329,7 @@ module.exports = {
 			// result -> true = blue side | false -> red side
 
 			// post results
-			const channel = client.channels.cache.get("1426080377856065616");
+			const channel = client.channels.cache.get("1426473782155022376");
 
 			channel.send({
 				components: [client.panels.get("Results")(match, result)],

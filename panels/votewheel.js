@@ -41,7 +41,7 @@ module.exports = {
 					});
 
 					// TODO: change back to 6
-					if (wheelVotesYes.length == 1) {
+					if (wheelVotesYes.length == 6) {
 						client.wheelResult(match, true);
 					}
 					else {
@@ -87,7 +87,7 @@ module.exports = {
 					});
 
 					// TODO: change back to 5
-					if (wheelVotesNo.length == 1) {
+					if (wheelVotesNo.length == 5) {
 						client.wheelResult(match, false);
 					}
 					else {

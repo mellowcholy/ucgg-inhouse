@@ -41,7 +41,7 @@ module.exports = {
 					});
 
 					// TODO: change back to 6
-					if (winnerVotesBlue.length == 1) {
+					if (winnerVotesBlue.length == 6) {
 						await client.winnerResult(match, true);
 					}
 					else {
@@ -87,7 +87,7 @@ module.exports = {
 					});
 
 					// TODO: change back to 6
-					if (winnerVotesRed.length == 1) {
+					if (winnerVotesRed.length == 6) {
 						await client.winnerResult(match, false);
 					}
 					else {

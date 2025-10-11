@@ -4,20 +4,20 @@ module.exports = {
 	run(client) {
 		// setup queue
 		client.queue = new Collection([
-			["Top", new Array("1", "2")],
-			["Jungle", new Array("3", "4")],
-			["Mid", new Array("5")],
-			["Bot", new Array("6")],
-			["Support", new Array("7", "8")],
-			["Fill", new Array("9")],
+			["Top", new Array()],
+			["Jungle", new Array()],
+			["Mid", new Array()],
+			["Bot", new Array()],
+			["Support", new Array()],
+			["Fill", new Array()],
 		]);
 
 		// create inhouse post func
 		client.RefreshInHousePost = function() {
-			const channel = client.channels.cache.get("1424956618361147432");
+			const channel = client.channels.cache.get("1426467987178655786");
 
 			if (client.latestInhousePost != null) {
-				client.latestInhousePost.delete();
+				client.latestInhousePost.delete().catch(console.error);
 			}
 
 			channel.send({
@@ -126,7 +126,7 @@ module.exports = {
 			match.set("number", matchId);
 
 			// make text channel and vcs
-			const category = client.channels.cache.get("1425744453263425547");
+			const category = client.channels.cache.get("1249690547413843991");
 			const guild = category.guild;
 
 			const textChannel = await guild.channels.create({
