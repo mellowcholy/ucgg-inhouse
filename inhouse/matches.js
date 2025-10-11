@@ -363,6 +363,11 @@ module.exports = {
 			match.delete("redVc");
 
 			match.delete("winnerVoteMsg");
+
+			// TODO: save data here
+
+			const number = match.get("number");
+			client.matches.delete(number);
 		};
 
 		client.refreshWinnerVote = function(match) {

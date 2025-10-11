@@ -26,6 +26,13 @@ module.exports = {
 							flags: MessageFlags.Ephemeral,
 						}).then(client.RefreshInHousePost());
 						return;
+
+					case 2:
+						await interaction.reply({
+							content: 'You are still in a match. If it has completed, make sure everyone has voted for the winner.',
+							flags: MessageFlags.Ephemeral,
+						});
+						return;
 					}
 				});
 			});

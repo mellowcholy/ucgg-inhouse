@@ -32,6 +32,16 @@ module.exports = {
 			const queue = client.queue;
 			const queuePos = queue.get(position);
 
+			// check if they are in a match
+			for (const [, match] of client.matches) {
+				const players = match.get("players");
+				for (let i = 0; i < players.length; i++) {
+					if (players[i] == userId) {
+						return 2;
+					}
+				}
+			}
+
 			for (const key of queue.keys()) {
 				const currentQueue = queue.get(key);
 				const isUserId = (v) => v == userId;
