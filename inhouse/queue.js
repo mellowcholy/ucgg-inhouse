@@ -121,7 +121,6 @@ module.exports = {
 			pingString += `. If not everyone has joined ${timeString}, the match will be cancelled.`;
 
 			// populate match with data
-			// TODO: peristent match numbers
 			const matchId = await client.keyv.get("matchNum") + 1 || 1;
 			match.set("number", matchId);
 

@@ -1,10 +1,14 @@
 // Require the necessary discord.js classes
+import "dotenv/config";
+
 const { Keyv } = require("keyv");
 const { KeyvSqlite } = require('@keyv/sqlite');
 const fs = require("node:fs");
 const path = require("node:path");
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
-const { token } = require('./config.json');
+
+const env = process.env.APP_ENV || "main";
+const { token } = env === "dev" ? require('./configdev.json') : require('./config.json');
 
 // create client
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates] });

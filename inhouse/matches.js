@@ -357,7 +357,6 @@ module.exports = {
 
 			match.delete("winnerVoteMsg");
 
-			// TODO: save data here
 			const number = match.get("number");
 
 			const teams = match.get("teams");
