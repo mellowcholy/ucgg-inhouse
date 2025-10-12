@@ -1,0 +1,10 @@
+#!/bin/bash
+# This wrapper calls PowerShell on Windows
+
+if command -v pwsh &> /dev/null; then
+  pwsh -ExecutionPolicy Bypass -File .githooks/post-checkout.ps1
+elif command -v powershell &> /dev/null; then
+  powershell -ExecutionPolicy Bypass -File .githooks/post-checkout.ps1
+else
+  echo "[Git Hook] No PowerShell found; skipping env switch."
+fi
