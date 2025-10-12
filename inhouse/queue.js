@@ -1,5 +1,9 @@
 const { MessageFlags, Collection, ChannelType, time, TimestampStyles } = require('discord.js');
 
+require("dotenv/config");
+const env = process.env.APP_ENV || "main";
+const { inhouse_category, inhouse_channel } = env === "dev" ? require('../configdev.json') : require('../config.json');
+
 module.exports = {
 	run(client) {
 		// setup queue
@@ -14,7 +18,7 @@ module.exports = {
 
 		// create inhouse post func
 		client.RefreshInHousePost = function() {
-			const channel = client.channels.cache.get("1426467987178655786");
+			const channel = client.channels.cache.get(inhouse_channel);
 
 			if (client.latestInhousePost != null) {
 				client.latestInhousePost.delete().catch(console.error);
@@ -125,7 +129,7 @@ module.exports = {
 			match.set("number", matchId);
 
 			// make text channel and vcs
-			const category = client.channels.cache.get("1249690547413843991");
+			const category = client.channels.cache.get(inhouse_category);
 			const guild = category.guild;
 
 			const textChannel = await guild.channels.create({

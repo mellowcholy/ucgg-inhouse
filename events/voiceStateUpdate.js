@@ -1,5 +1,9 @@
 const { Events, time, TimestampStyles } = require("discord.js");
 
+require("dotenv/config");
+const env = process.env.APP_ENV || "main";
+const { waiting_on } = env === "dev" ? require('../configdev.json') : require('../config.json');
+
 module.exports = {
 	name: Events.VoiceStateUpdate,
 	execute(_, newState) {
@@ -43,8 +47,7 @@ module.exports = {
 
 			waitingRoomPing.edit(pingString).catch(console.error);
 
-			// TODO: set to 0
-			if (waitingOn.length == 0) { client.BeginMatch(match); }
+			if (waitingOn.length == waiting_on) { client.BeginMatch(match); }
 		});
 	},
 };

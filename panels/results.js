@@ -1,5 +1,9 @@
 const { ContainerBuilder } = require("discord.js");
 
+require("dotenv/config");
+const env = process.env.APP_ENV || "main";
+const { mmr_gain, mmr_loss } = env === "dev" ? require('../configdev.json') : require('../config.json');
+
 module.exports = {
 	name: "Results",
 	getContainer(match, winner) {
@@ -18,10 +22,10 @@ module.exports = {
 			blueSideString += _string;
 
 			if (winner) {
-				blueSideString += ` -> [${mmr + 20}]\n`;
+				blueSideString += ` -> [${mmr + mmr_gain}]\n`;
 			}
 			else {
-				blueSideString += ` -> [${mmr - 20}]\n`;
+				blueSideString += ` -> [${mmr - mmr_loss}]\n`;
 			}
 		}
 
@@ -36,10 +40,10 @@ module.exports = {
 			redSideString += _string;
 
 			if (winner) {
-				redSideString += ` -> [${mmr - 20}]\n`;
+				redSideString += ` -> [${mmr - mmr_loss}]\n`;
 			}
 			else {
-				redSideString += ` -> [${mmr + 20}]\n`;
+				redSideString += ` -> [${mmr + mmr_gain}]\n`;
 			}
 		}
 

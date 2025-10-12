@@ -1,5 +1,9 @@
 const { Collection, MessageFlags, ChannelType } = require("discord.js");
 
+require("dotenv/config");
+const env = process.env.APP_ENV || "main";
+const { inhouse_category, results_channel, mmr_gain, mmr_loss, points_win, points_loss } = env === "dev" ? require('../configdev.json') : require('../config.json');
+
 module.exports = {
 	run(client) {
 		client.matches = new Collection();
@@ -281,7 +285,7 @@ module.exports = {
 			}).then(msg => match.set("winnerVoteMsg", msg));
 
 			// create team a and team b vc
-			const category = client.channels.cache.get("1249690547413843991");
+			const category = client.channels.cache.get(inhouse_category);
 			const guild = category.guild;
 
 			const blueVc = await guild.channels.create({
@@ -329,7 +333,7 @@ module.exports = {
 			// result -> true = blue side | false -> red side
 
 			// post results
-			const channel = client.channels.cache.get("1426473782155022376");
+			const channel = client.channels.cache.get(results_channel);
 
 			channel.send({
 				components: [client.panels.get("Results")(match, result)],
@@ -371,8 +375,8 @@ module.exports = {
 				const data = await client.keyv.get(id);
 
 				data["wins"]++;
-				data["points"] += 5;
-				data["mmrs"][role] += 20;
+				data["points"] += points_win;
+				data["mmrs"][role] += mmr_gain;
 
 				await client.keyv.set(id, data);
 			}
@@ -383,8 +387,8 @@ module.exports = {
 				const data = await client.keyv.get(id);
 
 				data["losses"]++;
-				data["points"] += 2;
-				data["mmrs"][role] -= 20;
+				data["points"] += points_loss;
+				data["mmrs"][role] -= mmr_loss;
 
 				data["mmrs"][role] = Math.max(0, data["mmrs"][role]);
 

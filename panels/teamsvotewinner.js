@@ -1,5 +1,9 @@
 const { ContainerBuilder, ButtonStyle, ButtonBuilder, MessageFlags } = require("discord.js");
 
+require("dotenv/config");
+const env = process.env.APP_ENV || "main";
+const { winner_vote } = env === "dev" ? require('../configdev.json') : require('../config.json');
+
 module.exports = {
 	name: "Teams and Vote Winner",
 	getContainer(client, match) {
@@ -40,8 +44,7 @@ module.exports = {
 						flags: MessageFlags.Ephemeral,
 					});
 
-					// TODO: change back to 6
-					if (winnerVotesBlue.length == 6) {
+					if (winnerVotesBlue.length == winner_vote) {
 						await client.winnerResult(match, true);
 					}
 					else {
@@ -86,8 +89,7 @@ module.exports = {
 						flags: MessageFlags.Ephemeral,
 					});
 
-					// TODO: change back to 6
-					if (winnerVotesRed.length == 6) {
+					if (winnerVotesRed.length == winner_vote) {
 						await client.winnerResult(match, false);
 					}
 					else {
