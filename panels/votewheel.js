@@ -2,7 +2,7 @@ const { ContainerBuilder, ButtonStyle, ButtonBuilder, MessageFlags } = require("
 
 require("dotenv/config");
 const env = process.env.APP_ENV || "main";
-const { wheel_vote_yes } = env === "dev" ? require('../configdev.json') : require('../config.json');
+const { wheel_vote_yes, wheel_vote_no } = env === "dev" ? require('../configdev.json') : require('../config.json');
 
 module.exports = {
 	name: "Vote Wheel",
