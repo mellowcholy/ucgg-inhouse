@@ -75,12 +75,15 @@ module.exports = {
 		const rolePlayers = new Collection();
 		const rolePlayerCount = new Collection();
 
+		let playerCount = 0;
+
 		for (const key of queue.keys()) {
 			const roleQueue = queue.get(key);
 
 			let _string = "";
 			roleQueue.forEach(id => {
 				_string += "<@" + id + "> ";
+				playerCount++;
 			});
 
 			rolePlayers.set(key, _string);
@@ -91,7 +94,7 @@ module.exports = {
 		const container = new ContainerBuilder()
 			.setAccentColor(0xac9cff)
 			.addTextDisplayComponents((textDisplay) =>
-				textDisplay.setContent('## In-House Queue\n-# by mellowcholy'),
+				textDisplay.setContent(`## In-House Queue\n-# ${playerCount} players in queue`),
 			)
 			.addSeparatorComponents((separator) => separator)
 			// top lane
