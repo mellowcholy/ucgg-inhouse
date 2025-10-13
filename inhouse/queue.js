@@ -4,14 +4,6 @@ require("dotenv/config");
 const env = process.env.APP_ENV || "main";
 const { inhouse_category, inhouse_channel } = env === "dev" ? require('../configdev.json') : require('../config.json');
 
-const refreshQueue = new Collection();
-
-function enqueue(channelId, task) {
-	const prev = refreshQueue.get(channelId) || Promise.resolve();
-	const next = prev.finally(() => task());
-	refreshQueue.set(channelId, next);
-}
-
 module.exports = {
 	run(client) {
 		// setup queue
@@ -137,6 +129,7 @@ module.exports = {
 			// populate match with data
 			const matchId = await client.keyv.get("matchNum") + 1 || 1;
 			match.set("number", matchId);
+			await client.keyv.set("matchNum", matchId);
 
 			// make text channel and vcs
 			const category = client.channels.cache.get(inhouse_category);

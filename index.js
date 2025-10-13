@@ -70,5 +70,14 @@ for (const file of eventFiles) {
 // handle cooldowns
 client.cooldowns = new Collection();
 
+// handle spam
+client.spamQueue = new Collection();
+
+client.enqueue = function(key, task) {
+	const prev = refreshQueue.get(key) || Promise.resolve();
+	const next = prev.finally(() => task());
+	refreshQueue.set(key, next);
+};
+
 // login
 client.login(token);
