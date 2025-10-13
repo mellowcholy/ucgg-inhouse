@@ -1,5 +1,9 @@
 const { SlashCommandBuilder, PermissionFlagsBits, InteractionContextType, MessageFlags } = require("discord.js");
 
+require("dotenv/config");
+const env = process.env.APP_ENV || "main";
+const { results_channel } = env === "dev" ? require('../../configdev.json') : require('../../config.json');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("cancel")
@@ -11,7 +15,7 @@ module.exports = {
 		await interaction.deferReply();
 
 		const number = interaction.options.getInteger("number");
-		const result = interaction.client.cancelMatch(number);
+		const result = await interaction.client.cancelMatch(number);
 
 		switch (result) {
 		case 0:
@@ -22,7 +26,7 @@ module.exports = {
 			return;
 
 		case 1:
-			await interaction.editReply({
+			await interaction.client.channels.cache.get(results_channel).send({
 				content: `${interaction.user.username} has cancelled Match #${number}`,
 			}).catch(console.error);
 			return;
