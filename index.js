@@ -74,9 +74,9 @@ client.cooldowns = new Collection();
 client.spamQueue = new Collection();
 
 client.enqueue = function(key, task) {
-	const prev = refreshQueue.get(key) || Promise.resolve();
+	const prev = client.spamQueue.get(key) || Promise.resolve();
 	const next = prev.finally(() => task());
-	refreshQueue.set(key, next);
+	client.spamQueue.set(key, next);
 };
 
 // login

@@ -219,15 +219,27 @@ module.exports = {
 		}
 
 		client.refreshVoteWheel = function(match) {
-			const wheelVoteMessage = match.get("wheelVoteMsg");
+			const key = "wheelVote" + match.get("number");
 
-			wheelVoteMessage.edit({
-				components: [client.panels.get("Vote Wheel")(client, match)],
-				flags: MessageFlags.IsComponentsV2,
+			client.enqueue(key, async () => {
+				const wheelVoteMessage = match.get("wheelVoteMsg");
+
+				// check if msg is valid
+				const valid = await wheelVoteMessage.channel.messages.fetch(wheelVoteMessage.id);
+
+				if (!valid) { return; }
+
+				wheelVoteMessage.edit({
+					components: [client.panels.get("Vote Wheel")(client, match)],
+					flags: MessageFlags.IsComponentsV2,
+				}).catch(console.error);
 			});
 		};
 
 		client.wheelResult = function(match, result) {
+			if (match.get("wheel_locked")) { return; }
+			match.set("wheel_locked", true);
+
 			const channel = match.get("textChannel");
 			const wheelVoteMessage = match.get("wheelVoteMsg");
 
@@ -266,6 +278,10 @@ module.exports = {
 		}
 
 		async function MoveToVoice(match) {
+			// prevent multiple deletions
+			if (match.get("move_locked")) { return; }
+			match.set("move_locked", true);
+
 			// clean up wheel data
 			match.delete("wheelVotesYes");
 			match.delete("wheelVotesNo");
@@ -331,6 +347,10 @@ module.exports = {
 
 		client.winnerResult = async function(match, result) {
 			// result -> true = blue side | false -> red side
+
+			// prevent multiple deletions
+			if (match.get("winner_locked")) { return; }
+			match.set("winner_locked", true);
 
 			// post results
 			const channel = client.channels.cache.get(results_channel);
@@ -399,12 +419,21 @@ module.exports = {
 		};
 
 		client.refreshWinnerVote = function(match) {
-			const winnerVoteMessage = match.get("winnerVoteMsg");
+			const key = "winnerVote" + match.get("number");
 
-			winnerVoteMessage.edit({
-				components: [client.panels.get("Teams and Vote Winner")(client, match)],
-				flags: MessageFlags.IsComponentsV2,
-				allowedMentions: { parse: [] },
+			client.enqueue(key, async () => {
+				const winnerVoteMessage = match.get("winnerVoteMsg");
+
+				// check if msg is valid
+				const valid = await winnerVoteMessage.channel.messages.fetch(winnerVoteMessage.id);
+
+				if (!valid) { return; }
+
+				winnerVoteMessage.edit({
+					components: [client.panels.get("Teams and Vote Winner")(client, match)],
+					flags: MessageFlags.IsComponentsV2,
+					allowedMentions: { parse: [] },
+				}).catch(console.error);
 			});
 		};
 	},

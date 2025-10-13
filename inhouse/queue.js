@@ -18,7 +18,7 @@ module.exports = {
 
 		// create inhouse post func
 		client.RefreshInHousePost = function() {
-			enqueue(inhouse_channel, async () => {
+			client.enqueue(inhouse_channel, async () => {
 				const channel = client.channels.cache.get(inhouse_channel);
 
 				if (client.latestInhousePost != null) {
