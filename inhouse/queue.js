@@ -4,6 +4,14 @@ require("dotenv/config");
 const env = process.env.APP_ENV || "main";
 const { inhouse_category, inhouse_channel } = env === "dev" ? require('../configdev.json') : require('../config.json');
 
+const refreshQueue = new Collection();
+
+function enqueue(channelId, task) {
+	const prev = refreshQueue.get(channelId) || Promise.resolve();
+	const next = prev.finally(() => task());
+	refreshQueue.set(channelId, next);
+}
+
 module.exports = {
 	run(client) {
 		// setup queue
@@ -18,17 +26,19 @@ module.exports = {
 
 		// create inhouse post func
 		client.RefreshInHousePost = function() {
-			const channel = client.channels.cache.get(inhouse_channel);
+			enqueue(inhouse_channel, async () => {
+				const channel = client.channels.cache.get(inhouse_channel);
 
-			if (client.latestInhousePost != null) {
-				client.latestInhousePost.delete().catch(console.error);
-			}
+				if (client.latestInhousePost != null) {
+					await client.latestInhousePost.delete().catch(console.error);
+				}
 
-			channel.send({
-				components: [client.panels.get("In-House Queue")(client)],
-				flags: MessageFlags.IsComponentsV2,
-				allowedMentions: { parse: [] },
-			}).then(msg => client.latestInhousePost = msg);
+				await channel.send({
+					components: [client.panels.get("In-House Queue")(client)],
+					flags: MessageFlags.IsComponentsV2,
+					allowedMentions: { parse: [] },
+				}).then(msg => client.latestInhousePost = msg);
+			});
 		};
 
 		// create join queue func
