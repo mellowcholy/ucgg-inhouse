@@ -3,12 +3,16 @@ const { Collection, MessageFlags, ChannelType } = require("discord.js");
 require("dotenv/config");
 const env = process.env.APP_ENV || "main";
 const { inhouse_category, results_channel, mmr_gain, mmr_loss, points_win, points_loss } = env === "dev" ? require('../configdev.json') : require('../config.json');
+const modifiers = require('../modifiers.json');
 
 module.exports = {
 	run(client) {
 		client.matches = new Collection();
 
 		client.BeginMatch = async function(match) {
+			if (match.get("begin_lock")) { return; }
+			match.set("begin_lock", true);
+
 			const teams = await BalanceTeams(match);
 
 			match.set("teams", teams);
@@ -246,8 +250,8 @@ module.exports = {
 			wheelVoteMessage.delete();
 
 			if (result) {
-				// TODO: wheel spin
-				channel.send(`The random modifier for this game is: **(WAITING ON RHO)**`);
+
+				channel.send(`The random modifier for this game is: ${modifiers.modifiers[modifiers.modifiers.length * Math.random() | 0]}`);
 			}
 			else {
 				channel.send("The wheel will not be spun.");

@@ -45,6 +45,10 @@ module.exports = {
 
 			pingString += `. If not everyone has joined ${timeString}, the match will be cancelled.`;
 
+			const valid = waitingRoomPing.channel.messages.fetch(waitingRoomPing.id);
+
+			if (!valid) { return; }
+
 			waitingRoomPing.edit(pingString).catch(console.error);
 
 			if (waitingOn.length == waiting_on) { client.BeginMatch(match); }
