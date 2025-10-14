@@ -10,9 +10,11 @@
   "license": "ISC",
   "dependencies": {
     "@keyv/sqlite": "^4.0.6",
+    "@napi-rs/canvas": "^0.1.80",
     "discord.js": "^14.22.1",
     "dotenv": "^17.2.3",
-    "keyv": "^5.5.3"
+    "keyv": "^5.5.3",
+    "undici": "^7.16.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
