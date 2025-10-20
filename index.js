@@ -7,11 +7,12 @@ const { Client, Collection, GatewayIntentBits } = require('discord.js');
 
 require("dotenv/config");
 const env = process.env.APP_ENV || "main";
-const { token } = env === "dev" ? require('./configdev.json') : require('./config.json');
+const config = env === "dev" ? require('./configdev.json') : require('./config.json');
 
 // create client
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates] });
 client.keyv = new Keyv(new KeyvSqlite(env === "dev" ? "./caitlyndev.db" : "./caitlyn.db"));
+client.config = config;
 
 // load commands
 client.commands = new Collection();
@@ -80,4 +81,4 @@ client.enqueue = function(key, task) {
 };
 
 // login
-client.login(token);
+client.login(config.token);

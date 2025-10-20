@@ -1,9 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, InteractionContextType, MessageFlags } = require("discord.js");
 
-require("dotenv/config");
-const env = process.env.APP_ENV || "main";
-const { results_channel } = env === "dev" ? require('../../configdev.json') : require('../../config.json');
-
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("cancel")
@@ -13,6 +9,8 @@ module.exports = {
 		.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
 		await interaction.deferReply();
+
+		const results_channel = interaction.client.config.results_channel;
 
 		const number = interaction.options.getInteger("number");
 		const result = await interaction.client.cancelMatch(number);

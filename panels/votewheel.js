@@ -1,13 +1,10 @@
 const { ContainerBuilder, ButtonStyle, ButtonBuilder, MessageFlags } = require("discord.js");
 
-require("dotenv/config");
-const env = process.env.APP_ENV || "main";
-const { wheel_vote_yes, wheel_vote_no } = env === "dev" ? require('../configdev.json') : require('../config.json');
-
 module.exports = {
 	name: "Vote Wheel",
 	getContainer(client, match) {
 		const matchId = match.get("number");
+		const config = client.config;
 
 		let wheelVotesYes = match.get("wheelVotesYes");
 		let wheelVotesNo = match.get("wheelVotesNo");
@@ -44,7 +41,7 @@ module.exports = {
 						flags: MessageFlags.Ephemeral,
 					});
 
-					if (wheelVotesYes.length == wheel_vote_yes) {
+					if (wheelVotesYes.length == config.wheel_vote_yes) {
 						client.wheelResult(match, true);
 					}
 					else {
@@ -89,7 +86,7 @@ module.exports = {
 						flags: MessageFlags.Ephemeral,
 					});
 
-					if (wheelVotesNo.length == wheel_vote_no) {
+					if (wheelVotesNo.length == client.wheel_vote_no) {
 						client.wheelResult(match, false);
 					}
 					else {

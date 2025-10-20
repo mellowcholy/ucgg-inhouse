@@ -1,13 +1,10 @@
 const { ContainerBuilder, ButtonStyle, ButtonBuilder, MessageFlags } = require("discord.js");
 
-require("dotenv/config");
-const env = process.env.APP_ENV || "main";
-const { winner_vote } = env === "dev" ? require('../configdev.json') : require('../config.json');
-
 module.exports = {
 	name: "Teams and Vote Winner",
 	getContainer(client, match) {
 		const matchId = match.get("number");
+		const winner_vote = client.config.winner_vote;
 
 		let winnerVotesBlue = match.get("winnerVotesBlue");
 		let winnerVotesRed = match.get("winnerVotesRed");

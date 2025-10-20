@@ -1,9 +1,5 @@
 const { MessageFlags, Collection, ChannelType, time, TimestampStyles } = require('discord.js');
 
-require("dotenv/config");
-const env = process.env.APP_ENV || "main";
-const { inhouse_category, inhouse_channel } = env === "dev" ? require('../configdev.json') : require('../config.json');
-
 module.exports = {
 	run(client) {
 		// setup queue
@@ -16,10 +12,12 @@ module.exports = {
 			["Fill", new Array()],
 		]);
 
+		const config = client.config;
+
 		// create inhouse post func
 		client.RefreshInHousePost = function() {
-			client.enqueue(inhouse_channel, async () => {
-				const channel = client.channels.cache.get(inhouse_channel);
+			client.enqueue(config.inhouse_channel, async () => {
+				const channel = client.channels.cache.get(config.inhouse_channel);
 
 				if (client.latestInhousePost != null) {
 					await client.latestInhousePost.delete().catch(console.error);
@@ -132,7 +130,7 @@ module.exports = {
 			await client.keyv.set("matchNum", matchId);
 
 			// make text channel and vcs
-			const category = client.channels.cache.get(inhouse_category);
+			const category = client.channels.cache.get(config.inhouse_category);
 			const guild = category.guild;
 
 			const textChannel = await guild.channels.create({
