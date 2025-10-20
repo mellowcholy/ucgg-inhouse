@@ -14,12 +14,12 @@ module.exports = {
 		context.drawImage(background, 0, 0, canvas.width, canvas.height);
 
 		// name
-		context.font = 'semibold 48px Bahnschrift';
+		context.font = 'bold 48px Bahnschrift';
 		context.fillStyle = '#1e1d1b';
 		context.fillText(target.displayName, 236, 129);
 
 		// role mmr
-		context.font = '100 36px Bahnschrift';
+		context.font = '36px Bahnschrift';
 		context.fillStyle = '#464542';
 
 		let mmrHeight = 341;
