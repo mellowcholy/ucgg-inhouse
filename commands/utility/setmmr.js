@@ -30,8 +30,7 @@ module.exports = {
 		const role = interaction.options.getString("role");
 		const mmr = interaction.options.getInteger("mmr");
 
-		let data = await client.keyv.get(target.id);
-		if (!data) data = await client.InitialisePlayer(target.id);
+		const data = await client.LoadPlayer(target.id);
 
 		if (role == "All") {
 			for (const k of Object.keys(data.mmrs)) {
@@ -42,7 +41,7 @@ module.exports = {
 			data.mmrs[role] = mmr;
 		}
 
-		await client.keyv.set(target.id, data);
+		await client.SavePlayer(target.id, data);
 
 		await interaction.editReply({
 			content: `<@${target.id}>'s MMR for: ${role} has been set to ${mmr}.`,

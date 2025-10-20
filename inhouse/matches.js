@@ -60,27 +60,6 @@ module.exports = {
 			client.cancelMatch(number);
 		};
 
-		client.InitialisePlayer = async function(id) {
-			const data = {};
-
-			data["wins"] = 0;
-			data["losses"] = 0;
-			data["points"] = 0;
-			data["mvps"] = 0;
-			data["items"] = new Array();
-			data["mmrs"] = {
-				"Top": 1000,
-				"Jungle": 1000,
-				"Mid": 1000,
-				"Bot": 1000,
-				"Support": 1000,
-			};
-
-			await client.keyv.set(id, data);
-
-			return data;
-		};
-
 		async function BalanceTeams(match) {
 
 			const players = match.get("positions");
@@ -96,8 +75,7 @@ module.exports = {
 				// Use Promise.all to wait for all async gets to complete
 				const mmrData = await Promise.all(
 					v.map(async player => {
-						let data = await client.keyv.get(player);
-						if (!data) data = await client.InitialisePlayer(player);
+						const data = await client.LoadPlayer(player);
 
 						const plyMMR = data["mmrs"];
 						const mmr = k == "Fill" ? plyMMR : plyMMR[k];
@@ -394,19 +372,19 @@ module.exports = {
 			// winner
 			for (const [role, player] of winner) {
 				const [id] = Object.entries(player)[0];
-				const data = await client.keyv.get(id);
+				const data = await client.LoadPlayer(id);
 
 				data["wins"]++;
 				data["points"] += config.points_win;
 				data["mmrs"][role] += config.mmr_gain;
 
-				await client.keyv.set(id, data);
+				await client.SavePlayer(id, data);
 			}
 
 			// loser
 			for (const [role, player] of loser) {
 				const [id] = Object.entries(player)[0];
-				const data = await client.keyv.get(id);
+				const data = await client.LoadPlayer(id);
 
 				data["losses"]++;
 				data["points"] += config.points_loss;
@@ -414,7 +392,7 @@ module.exports = {
 
 				data["mmrs"][role] = Math.max(0, data["mmrs"][role]);
 
-				await client.keyv.set(id, data);
+				await client.SavePlayer(id, data);
 			}
 
 			client.matches.delete(number);

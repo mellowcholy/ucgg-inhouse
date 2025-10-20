@@ -4,6 +4,7 @@ const { KeyvSqlite } = require('@keyv/sqlite');
 const fs = require("node:fs");
 const path = require("node:path");
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const database_manager = require("./database_manager.js");
 
 require("dotenv/config");
 const env = process.env.APP_ENV || "main";
@@ -13,6 +14,7 @@ const config = env === "dev" ? require('./configdev.json') : require('./config.j
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates] });
 client.keyv = new Keyv(new KeyvSqlite(env === "dev" ? "./caitlyndev.db" : "./caitlyn.db"));
 client.config = config;
+database_manager.run(client);
 
 // load commands
 client.commands = new Collection();

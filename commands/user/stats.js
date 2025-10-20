@@ -13,11 +13,9 @@ module.exports = {
 		const client = interaction.client;
 		const target = interaction.options.getUser("target") || interaction.user;
 
-		let data = await client.keyv.get(target.id);
-		if (!data) data = await client.InitialisePlayer(target.id);
+		const data = await client.LoadPlayer(target.id);
 
-		const profile_name = "terminal_green";
-		const profile = require(`../../profiles/${profile_name}.js`);
+		const profile = require(`../../profiles/${data.profile}.js`);
 
 		const attachment = await profile.create(target, data);
 
