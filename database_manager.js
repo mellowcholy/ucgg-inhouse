@@ -24,18 +24,23 @@ module.exports = {
 			return data;
 		};
 
+		client.SavePlayer = async function(id, data) {
+			await db.set(id, data);
+		};
+
 		client.LoadPlayer = async function(id) {
 			let data = await db.get(id);
 			if (!data) { data = await client.InitialisePlayer(id); }
 
 			// setup later vars here;
-			if (!data.profile) { data["profile"] = "modern_white"; }
+			let shouldSave = false;
+			if (!data.profile) { data["profile"] = "modern_white"; shouldSave = true; }
+
+			if (shouldSave) {
+				client.SavePlayer(id, data);
+			}
 
 			return data;
-		};
-
-		client.SavePlayer = async function(id, data) {
-			await db.set(id, data);
 		};
 	},
 };
