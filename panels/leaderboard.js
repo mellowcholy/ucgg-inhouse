@@ -12,85 +12,91 @@ module.exports = {
 		async function setupButtons() {
 			client.buttons.set("prevPage", PreviousPage);
 			async function PreviousPage(int) {
+				await int.deferReply({ flags: MessageFlags.Ephemeral });
+
 				num--;
 				num = Math.max(0, num);
 
 				const pnl = await DrawLeaderboard(num);
 				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] });
 
-				await int.reply("You have changed the page.");
-				int.deleteReply();
+				await int.editReply({
+					content: "You have changed the page.",
+					flags: MessageFlags.Ephemeral,
+				});
 			}
 
 			client.buttons.set("nextPage", NextPage);
 			async function NextPage(int) {
+				await int.deferReply({ flags: MessageFlags.Ephemeral });
+
 				num++;
 				num = Math.min(maxPages - 1, num);
 
 				const pnl = await DrawLeaderboard(num);
 				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] });
 
-				await int.reply("You have changed the page.");
-				int.deleteReply();
+				await int.editReply({
+					content: "You have changed the page.",
+					flags: MessageFlags.Ephemeral,
+				});
 			}
 		}
 		setupButtons();
 
 		// DATA
-		let maxPages = 0;
-		async function DrawLeaderboard(pn) {
-			// sort by key
-			const leaderboard = [];
-			for await (const [key, value] of client.keyv.iterator()) {
-				if (!value.wins) { continue; }
+		const leaderboard = [];
+		for await (const [key, value] of client.keyv.iterator()) {
+			if (!value.mmrs) { continue; }
 
-				leaderboard.push([key, value]);
+			leaderboard.push([key, value]);
     	};
 
-			const key = stat;
-			let label = "";
-			let mmr = false;
+		const key = stat;
+		let label = "";
+		let mmr = false;
 
-			switch (stat) {
-			case "wins":
-			case "losses":
-			case "mvps":
-				label = stat.charAt(0).toUpperCase() + stat.slice(1);
-				break;
-			case "points":
-				label = "Credits";
-				break;
-			case "Top":
-			case "Jungle":
-			case "Mid":
-			case "Bot":
-			case "Support":
-				label = stat;
-				mmr = true;
-				break;
+		switch (stat) {
+		case "wins":
+		case "losses":
+		case "mvps":
+			label = stat.charAt(0).toUpperCase() + stat.slice(1);
+			break;
+		case "points":
+			label = "Credits";
+			break;
+		case "Top":
+		case "Jungle":
+		case "Mid":
+		case "Bot":
+		case "Support":
+			label = stat;
+			mmr = true;
+			break;
+		}
+
+		const sorted = leaderboard.sort(([, a], [, b]) => mmr ? b["mmrs"][key] - a["mmrs"][key] : b[key] - a[key]);
+		const pages = [];
+
+		let page = [];
+		let counter = 1;
+		for (let i = 0; i < sorted.length; i++) {
+			page.push([i + 1, sorted[i]]);
+
+			if (counter == 6) {
+				pages.push(page);
+				page = [];
+				counter = 0;
 			}
 
-			const sorted = leaderboard.sort(([, a], [, b]) => mmr ? b["mmrs"][key] - a["mmrs"][key] : b[key] - a[key]);
-			const pages = [];
+			counter++;
+		}
 
-			let page = [];
-			let counter = 1;
-			for (let i = 0; i < sorted.length; i++) {
-				page.push([i + 1, sorted[i]]);
+		if (page.length > 0) { pages.push(page); }
 
-				if (counter == 6) {
-					pages.push(page);
-					page = [];
-					counter = 0;
-				}
+		const maxPages = pages.length;
 
-				counter++;
-			}
-
-			if (page.length > 0) { pages.push(page); }
-
-			maxPages = pages.length;
-
+		async function DrawLeaderboard(pn) {
 			// create leaderboard image
 			const canvas = Canvas.createCanvas(825, 620);
 			const context = canvas.getContext("2d");
@@ -123,7 +129,7 @@ module.exports = {
 					member = await interaction.guild.members.fetch(id);
 				}
 
-				const name = member.displayname;
+				const name = member.displayName;
 				context.textAlign = "left";
 				context.fillText(`${name}`, 182, y + 48);
 
