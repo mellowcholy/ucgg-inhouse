@@ -6,7 +6,19 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("leaderboard")
 		.setDescription("View everyone's stats.")
-		.addStringOption((option) => option.setName("stat").setDescription("What stat to sort players by.").setRequired(true))
+		.addStringOption((option) => option.setName("stat").setDescription("What stat to sort players by.").setRequired(true)
+			.addChoices(
+				{ name: "Wins", value: "wins" },
+				{ name: "Losses", value: "losses" },
+				{ name: "Credits", value: "points" },
+				{ name: "MVPs", value: "mvps" },
+				{ name: "Top MMR", value: "Top" },
+				{ name: "Jungle MMR", value: "Jungle" },
+				{ name: "Mid MMR", value: "Mid" },
+				{ name: "Bot MMR", value: "Bot" },
+				{ name: "Support MMR", value: "Support" },
+
+			))
 		.addIntegerOption((option) => option.setName("pagenumber").setDescription("What page to view"))
 		.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
@@ -22,16 +34,39 @@ module.exports = {
 			leaderboard.push([key, value]);
     	};
 
-		const key = interaction.options.getString("stat");
+		const stat = interaction.options.getString("stat");
+		const key = stat;
+		let label = "";
+		let mmr = false;
+
+		switch (stat) {
+		case "wins":
+		case "losses":
+		case "mvps":
+			label = stat.charAt(0).toUpperCase() + stat.slice(1);
+			break;
+		case "points":
+			label = "Credits";
+			break;
+		case "Top":
+		case "Jungle":
+		case "Mid":
+		case "Bot":
+		case "Support":
+			label = stat;
+			mmr = true;
+			break;
+		}
+
 		const pageNum = interaction.options.getInteger("pagenumber") ?? 0;
 
-		const sorted = leaderboard.sort(([, a], [, b]) => b[key] - a[key]);
+		const sorted = leaderboard.sort(([, a], [, b]) => mmr ? b["mmrs"][key] - a["mmrs"][key] : b[key] - a[key]);
 		const pages = [];
 
 		let page = [];
 		let counter = 1;
 		for (let i = 0; i < sorted.length; i++) {
-			page.push(sorted[i]);
+			page.push([i + 1, sorted[i]]);
 
 			if (counter == 6) {
 				pages.push(page);
@@ -39,14 +74,10 @@ module.exports = {
 				counter = 0;
 			}
 
-			// TODO: ADD PLACEMENT NUMBER TO ARRAY
+			counter++;
 		}
 
 		if (page.length > 0) { pages.push(page); }
-
-		for (let i = 0; i < pages.length; i++) {
-			console.log(pages[i]);
-		}
 
 		// create leaderboard image
 		const canvas = Canvas.createCanvas(825, 620);
@@ -60,7 +91,7 @@ module.exports = {
 		context.font = 'bold 30px Bahnschrift';
 		context.fillStyle = '#1e1d1b';
 		context.textAlign = "center";
-		context.fillText(`In House - ${key.charAt(0).toUpperCase() + key.slice(1)}`, 413, 60);
+		context.fillText(`In House - ${label}`, 413, 60);
 
 		async function drawUser(id, y, position, value) {
 			// background
@@ -94,7 +125,12 @@ module.exports = {
 
 		let yPos = 92;
 		for (let i = 0; i < pages[pageNum].length; i++) {
-			await drawUser(pages[pageNum][i][0], yPos, i + 1, pages[pageNum][i][1][key]);
+			const entry = pages[pageNum][i];
+			const position = entry[0];
+			const id = entry[1][0];
+			const value = mmr ? entry[1][1]["mmrs"][key] : entry[1][1][key];
+
+			await drawUser(id, yPos, position, value);
 
 			yPos += 3 + 82;
 		}
