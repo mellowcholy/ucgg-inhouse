@@ -11,7 +11,7 @@ const env = process.env.APP_ENV || "main";
 const config = env === "dev" ? require('./configdev.json') : require('./config.json');
 
 // create client
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
 client.keyv = new Keyv(new KeyvSqlite(env === "dev" ? "./caitlyndev.db" : "./caitlyn.db"));
 client.config = config;
 database_manager.run(client);
