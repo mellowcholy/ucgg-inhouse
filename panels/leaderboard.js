@@ -20,10 +20,7 @@ module.exports = {
 				const pnl = await DrawLeaderboard(num);
 				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] });
 
-				await int.editReply({
-					content: "You have changed the page.",
-					flags: MessageFlags.Ephemeral,
-				});
+				await int.deleteReply();
 			}
 
 			client.buttons.set("nextPage", NextPage);
@@ -36,10 +33,7 @@ module.exports = {
 				const pnl = await DrawLeaderboard(num);
 				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] });
 
-				await int.editReply({
-					content: "You have changed the page.",
-					flags: MessageFlags.Ephemeral,
-				});
+				await int.deleteReply();
 			}
 		}
 		setupButtons();
