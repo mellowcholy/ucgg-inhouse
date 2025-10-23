@@ -93,7 +93,7 @@ module.exports = {
 		async function DrawLeaderboard(pn) {
 			// create leaderboard image
 			const canvas = Canvas.createCanvas(825, 620);
-			const context = canvas.getContext("2d");
+			const context = canvas.getContext("2d", { alpha: false });
 			const background = await Canvas.loadImage('./img/leaderboard.png');
 			const slot = await Canvas.loadImage('./img/leaderboard_slot.png');
 
