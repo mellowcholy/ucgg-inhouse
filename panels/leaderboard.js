@@ -18,9 +18,9 @@ module.exports = {
 				num = Math.max(0, num);
 
 				const pnl = await DrawLeaderboard(num);
-				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] });
+				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] }).catch(error);
 
-				await int.deleteReply();
+				await int.deleteReply().catch(error);
 			}
 
 			client.buttons.set("nextPage", NextPage);
@@ -31,9 +31,9 @@ module.exports = {
 				num = Math.min(maxPages - 1, num);
 
 				const pnl = await DrawLeaderboard(num);
-				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] });
+				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] }).catch(error);
 
-				await int.deleteReply();
+				await int.deleteReply().catch(error);
 			}
 		}
 		setupButtons();
