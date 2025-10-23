@@ -106,7 +106,7 @@ module.exports = {
 			context.fillText(`In House - ${label}`, 413, 60);
 
 			async function drawUser(id, y, position, value) {
-			// background
+				// background
 				context.drawImage(slot, 27, y);
 
 				context.font = '30px Bahnschrift';
@@ -117,16 +117,13 @@ module.exports = {
 				context.fillText(`${position}.`, 69, y + 48);
 
 				// name
-				/*
-			let member = interaction.guild.members.cache.get(id);
+				let member = interaction.guild.members.cache.get(id);
 
-			if (!member) {
-				member = await interaction.guild.members.fetch(id);
-			}
+				if (!member) {
+					member = await interaction.guild.members.fetch(id);
+				}
 
-			const name = member.displayname;
-			*/
-				const name = id;
+				const name = member.displayname;
 				context.textAlign = "left";
 				context.fillText(`${name}`, 182, y + 48);
 
@@ -135,9 +132,7 @@ module.exports = {
 				context.fillText(`${value}`, canvas.width - 57, y + 48);
 
 				// avatar
-				// TODO: REMOVE:
-				const target = interaction.guild.members.cache.get("259167676902014987");
-				const { body } = await request(target.displayAvatarURL({ extension: 'jpg' }));
+				const { body } = await request(member.displayAvatarURL({ extension: 'jpg' }));
 				const avatar = await Canvas.loadImage(await body.arrayBuffer());
 
 				context.save();
