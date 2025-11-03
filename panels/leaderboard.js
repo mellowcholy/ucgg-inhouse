@@ -117,7 +117,7 @@ module.exports = {
 				const { body } = await request(avatarURL);
 				const buffer = Buffer.from(await body.arrayBuffer());
 
-				client.cache.set(avatarURL, buffer, 3600);
+				client.cache.set(avatarURL, buffer, 86400);
 
 				return Canvas.loadImage(buffer);
 			}
