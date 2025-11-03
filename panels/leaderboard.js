@@ -94,8 +94,10 @@ module.exports = {
 			// create leaderboard image
 			const canvas = Canvas.createCanvas(825, 620);
 			const context = canvas.getContext("2d");
-			const background = await Canvas.loadImage('./img/leaderboard.png');
-			const slot = await Canvas.loadImage('./img/leaderboard_slot.png');
+			const [background, slot] = await Promise.all([
+				Canvas.loadImage('./img/leaderboard.png'),
+				Canvas.loadImage('./img/leaderboard_slot.png'),
+			]);
 
 			context.drawImage(background, 0, 0, canvas.width, canvas.height);
 
