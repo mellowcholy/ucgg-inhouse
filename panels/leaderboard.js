@@ -5,7 +5,6 @@ const { request } = require('undici');
 module.exports = {
 	name: "Leaderboard",
 	async getContainer(client, stat, pagenumber = 0, interaction) {
-
 		// buttons
 		let num = pagenumber;
 
@@ -109,6 +108,20 @@ module.exports = {
 			context.textAlign = "center";
 			context.fillText(`In House - ${label}`, 413, 60);
 
+			async function getAvatar(member) {
+				const avatarURL = member.displayAvatarURL({ extension: 'jpg' });
+
+				const cachedAvatar = client.cache.get(avatarURL);
+				if (cachedAvatar != undefined) { return Canvas.loadImage(cachedAvatar); }
+
+				const { body } = await request(avatarURL);
+				const buffer = Buffer.from(await body.arrayBuffer());
+
+				client.cache.set(avatarURL, buffer, 3600);
+
+				return Canvas.loadImage(buffer);
+			}
+
 			async function drawUser(member, y, position, value) {
 				// background
 				context.drawImage(slot, 27, y);
@@ -129,8 +142,7 @@ module.exports = {
 				context.fillText(`${value}`, canvas.width - 57, y + 48);
 
 				// avatar
-				const { body } = await request(member.displayAvatarURL({ extension: 'jpg' }));
-				const avatar = await Canvas.loadImage(await body.arrayBuffer());
+				const avatar = await getAvatar(member);
 
 				context.save();
 				context.beginPath();
@@ -143,9 +155,7 @@ module.exports = {
 
 			const memberIds = pages[pn].map(val => val[1][0]);
 			const members = await Promise.all(
-				memberIds.map(async id =>
-					interaction.guild.members.cache.get(id) || interaction.guild.members.fetch(id)
-				),
+				memberIds.map(async id => interaction.guild.members.cache.get(id) || interaction.guild.members.fetch(id)),
 			);
 
 			let yPos = 92;
