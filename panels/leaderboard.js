@@ -107,7 +107,7 @@ module.exports = {
 			context.textAlign = "center";
 			context.fillText(`In House - ${label}`, 413, 60);
 
-			async function drawUser(id, y, position, value) {
+			async function drawUser(member, y, position, value) {
 				// background
 				context.drawImage(slot, 27, y);
 
@@ -117,13 +117,6 @@ module.exports = {
 				// position
 				context.textAlign = "center";
 				context.fillText(`${position}.`, 69, y + 48);
-
-				// name
-				let member = interaction.guild.members.cache.get(id);
-
-				if (!member) {
-					member = await interaction.guild.members.fetch(id);
-				}
 
 				const name = member.displayName;
 				context.textAlign = "left";
@@ -146,17 +139,27 @@ module.exports = {
 				context.restore();
 			};
 
+			const memberIds = pages[pn].map(val => val[1][0]);
+			const members = await Promise.all(
+				memberIds.map(async id =>
+					interaction.guild.members.cache.get(id) || interaction.guild.members.fetch(id)
+				),
+			);
+
 			let yPos = 92;
+			const drawPromises = [];
+
 			for (let i = 0; i < pages[pn].length; i++) {
 				const entry = pages[pn][i];
 				const position = entry[0];
-				const id = entry[1][0];
 				const value = mmr ? entry[1][1]["mmrs"][key] : entry[1][1][key];
 
-				await drawUser(id, yPos, position, value);
+				drawPromises.push(drawUser(members[i], yPos, position, value));
 
 				yPos += 3 + 82;
 			}
+
+			await Promise.all(drawPromises);
 
 			// panels
 			const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'leaderboard.png' });
