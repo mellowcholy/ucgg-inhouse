@@ -3,6 +3,7 @@ const { Keyv } = require("keyv");
 const { KeyvSqlite } = require('@keyv/sqlite');
 const fs = require("node:fs");
 const path = require("node:path");
+const NodeCache = require("node-cache");
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const database_manager = require("./database_manager.js");
 
@@ -13,6 +14,7 @@ const config = env === "dev" ? require('./configdev.json') : require('./config.j
 // create client
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
 client.keyv = new Keyv(new KeyvSqlite(env === "dev" ? "./caitlyndev.db" : "./caitlyn.db"));
+client.cache = new NodeCache();
 client.config = config;
 database_manager.run(client);
 

@@ -5,7 +5,6 @@ const { request } = require('undici');
 module.exports = {
 	name: "Leaderboard",
 	async getContainer(client, stat, pagenumber = 0, interaction) {
-
 		// buttons
 		let num = pagenumber;
 
@@ -18,9 +17,9 @@ module.exports = {
 				num = Math.max(0, num);
 
 				const pnl = await DrawLeaderboard(num);
-				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] }).catch(error);
+				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] });
 
-				await int.deleteReply().catch(error);
+				await int.deleteReply();
 			}
 
 			client.buttons.set("nextPage", NextPage);
@@ -31,9 +30,9 @@ module.exports = {
 				num = Math.min(maxPages - 1, num);
 
 				const pnl = await DrawLeaderboard(num);
-				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] }).catch(error);
+				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] });
 
-				await int.deleteReply().catch(error);
+				await int.deleteReply();
 			}
 		}
 		setupButtons();
@@ -93,9 +92,13 @@ module.exports = {
 		async function DrawLeaderboard(pn) {
 			// create leaderboard image
 			const canvas = Canvas.createCanvas(825, 620);
-			const context = canvas.getContext("2d", { alpha: false });
-			const background = await Canvas.loadImage('./img/leaderboard.png');
-			const slot = await Canvas.loadImage('./img/leaderboard_slot.png');
+			const context = canvas.getContext("2d");
+			context.imageSmoothingEnabled = true;
+			context.imageSmoothingQuality = "low";
+			const [background, slot] = await Promise.all([
+				Canvas.loadImage('./img/leaderboard.png'),
+				Canvas.loadImage('./img/leaderboard_slot.png'),
+			]);
 
 			context.drawImage(background, 0, 0, canvas.width, canvas.height);
 
@@ -105,7 +108,21 @@ module.exports = {
 			context.textAlign = "center";
 			context.fillText(`In House - ${label}`, 413, 60);
 
-			async function drawUser(id, y, position, value) {
+			async function getAvatar(member) {
+				const avatarURL = member.displayAvatarURL({ extension: 'jpg' });
+
+				const cachedAvatar = client.cache.get(avatarURL);
+				if (cachedAvatar != undefined) { return Canvas.loadImage(cachedAvatar); }
+
+				const { body } = await request(avatarURL);
+				const buffer = Buffer.from(await body.arrayBuffer());
+
+				client.cache.set(avatarURL, buffer, 86400);
+
+				return Canvas.loadImage(buffer);
+			}
+
+			async function drawUser(member, y, position, value) {
 				// background
 				context.drawImage(slot, 27, y);
 
@@ -116,13 +133,6 @@ module.exports = {
 				context.textAlign = "center";
 				context.fillText(`${position}.`, 69, y + 48);
 
-				// name
-				let member = interaction.guild.members.cache.get(id);
-
-				if (!member) {
-					member = await interaction.guild.members.fetch(id);
-				}
-
 				const name = member.displayName;
 				context.textAlign = "left";
 				context.fillText(`${name}`, 182, y + 48);
@@ -132,8 +142,7 @@ module.exports = {
 				context.fillText(`${value}`, canvas.width - 57, y + 48);
 
 				// avatar
-				const { body } = await request(member.displayAvatarURL({ extension: 'jpg' }));
-				const avatar = await Canvas.loadImage(await body.arrayBuffer());
+				const avatar = await getAvatar(member);
 
 				context.save();
 				context.beginPath();
@@ -144,17 +153,25 @@ module.exports = {
 				context.restore();
 			};
 
+			const memberIds = pages[pn].map(val => val[1][0]);
+			const members = await Promise.all(
+				memberIds.map(async id => interaction.guild.members.cache.get(id) || interaction.guild.members.fetch(id)),
+			);
+
 			let yPos = 92;
+			const drawPromises = [];
+
 			for (let i = 0; i < pages[pn].length; i++) {
 				const entry = pages[pn][i];
 				const position = entry[0];
-				const id = entry[1][0];
 				const value = mmr ? entry[1][1]["mmrs"][key] : entry[1][1][key];
 
-				await drawUser(id, yPos, position, value);
+				drawPromises.push(drawUser(members[i], yPos, position, value));
 
 				yPos += 3 + 82;
 			}
+
+			await Promise.all(drawPromises);
 
 			// panels
 			const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'leaderboard.png' });
