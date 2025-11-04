@@ -86,7 +86,7 @@ module.exports = {
 						flags: MessageFlags.Ephemeral,
 					});
 
-					if (wheelVotesNo.length >= client.wheel_vote_no) {
+					if (wheelVotesNo.length >= config.wheel_vote_no) {
 						client.wheelResult(match, false);
 					}
 					else {

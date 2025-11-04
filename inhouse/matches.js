@@ -321,7 +321,7 @@ module.exports = {
 
 			// delete waiting room
 			const waitingRoom = match.get("waitingRoom");
-			setTimeout(async () => waitingRoom.delete(), 5000);
+			setTimeout(async () => waitingRoom.delete(), 10000);
 			match.delete("waitingRoom");
 		}
 
