@@ -41,7 +41,7 @@ module.exports = {
 						flags: MessageFlags.Ephemeral,
 					});
 
-					if (wheelVotesYes.length == config.wheel_vote_yes) {
+					if (wheelVotesYes.length >= config.wheel_vote_yes) {
 						client.wheelResult(match, true);
 					}
 					else {
@@ -86,7 +86,7 @@ module.exports = {
 						flags: MessageFlags.Ephemeral,
 					});
 
-					if (wheelVotesNo.length == client.wheel_vote_no) {
+					if (wheelVotesNo.length >= client.wheel_vote_no) {
 						client.wheelResult(match, false);
 					}
 					else {
