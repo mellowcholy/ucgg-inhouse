@@ -35,7 +35,7 @@ module.exports = {
 				await int.deleteReply();
 			}
 		}
-		setupButtons();
+		await setupButtons();
 
 		// DATA
 		const leaderboard = [];
