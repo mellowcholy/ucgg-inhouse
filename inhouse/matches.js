@@ -242,6 +242,8 @@ module.exports = {
 			if (ping != null) {
 				ping.delete();
 			}
+			match.delete("waitingRoomPing");
+			match.delete("waitingOn");
 
 			// vote for wheel spin.
 			match.set("wheelVotesYes", new Array());
@@ -259,6 +261,12 @@ module.exports = {
 			// prevent multiple deletions
 			if (match.get("move_locked")) { return; }
 			match.set("move_locked", true);
+
+			// clean up wheel data
+			match.delete("wheelVotesYes");
+			match.delete("wheelVotesNo");
+			match.delete("wheelvote");
+			match.delete("wheelVoteMsg");
 
 			// vote for wheel spin.
 			match.set("winnerVotesBlue", new Array());
@@ -314,6 +322,7 @@ module.exports = {
 			// delete waiting room
 			const waitingRoom = match.get("waitingRoom");
 			setTimeout(async () => waitingRoom.delete(), 10000);
+			match.delete("waitingRoom");
 		}
 
 		client.winnerResult = async function(match, result) {
@@ -333,14 +342,24 @@ module.exports = {
 			});
 
 			// delete vc and text and other data
+			match.delete("positions");
 			const textChannel = match.get("textChannel");
 			textChannel.delete();
 
+			match.delete("textChannel");
+			match.delete("winnerVotesBlue");
+			match.delete("winnerVotesRed");
+			match.delete("winnervote");
+
 			const blueVc = match.get("blueVc");
 			blueVc.delete();
+			match.delete("blueVc");
 
 			const redVc = match.get("redVc");
 			redVc.delete();
+			match.delete("redVc");
+
+			match.delete("winnerVoteMsg");
 
 			const number = match.get("number");
 
