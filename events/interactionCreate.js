@@ -75,13 +75,13 @@ module.exports = {
 					await interaction.followUp({
 						content: 'There was an error while using this button!',
 						flags: MessageFlags.Ephemeral,
-					}).catch(console.error);
+					});
 				}
 				else {
 					await interaction.reply({
 						content: 'There was an error while using this button!',
 						flags: MessageFlags.Ephemeral,
-					}).catch(console.error);
+					});
 				}
 			}
 		}
