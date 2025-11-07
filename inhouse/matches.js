@@ -15,7 +15,7 @@ module.exports = {
 
 			match.set("teams", teams);
 
-			await WheelVote(match);
+			WheelVote(match);
 		};
 
 		client.cancelMatch = function(number) {
@@ -209,9 +209,8 @@ module.exports = {
 
 				if (!valid) { return; }
 
-				const panel = await client.panels.get("Vote Wheel")(client, match);
 				wheelVoteMessage.edit({
-					components: [panel],
+					components: [client.panels.get("Vote Wheel")(client, match)],
 					flags: MessageFlags.IsComponentsV2,
 				}).catch(console.error);
 			});
@@ -237,7 +236,7 @@ module.exports = {
 			MoveToVoice(match);
 		};
 
-		async function WheelVote(match) {
+		function WheelVote(match) {
 			// cleanup match data
 			const ping = match.get("waitingRoomPing");
 			if (ping != null) {
@@ -250,9 +249,8 @@ module.exports = {
 
 			const channel = match.get("textChannel");
 
-			const panel = await client.panels.get("Vote Wheel")(client, match);
 			channel.send({
-				components: [panel],
+				components: [client.panels.get("Vote Wheel")(client, match)],
 				flags: MessageFlags.IsComponentsV2,
 			}).then(msg => match.set("wheelVoteMsg", msg));
 		}
@@ -268,9 +266,8 @@ module.exports = {
 
 			const channel = match.get("textChannel");
 
-			const panel = await client.panels.get("Teams and Vote Winner")(client, match);
 			channel.send({
-				components: [panel],
+				components: [client.panels.get("Teams and Vote Winner")(client, match)],
 				flags: MessageFlags.IsComponentsV2,
 				allowedMentions: { parse: [] },
 			}).then(msg => match.set("winnerVoteMsg", msg));
@@ -329,9 +326,8 @@ module.exports = {
 			// post results
 			const channel = client.channels.cache.get(config.results_channel);
 
-			const panel = await client.panels.get("Results")(client.config, match, result);
 			channel.send({
-				components: [panel],
+				components: [client.panels.get("Results")(client.config, match, result)],
 				flags: MessageFlags.IsComponentsV2,
 				allowedMentions: { parse: [] },
 			});
@@ -394,9 +390,8 @@ module.exports = {
 
 				if (!valid) { return; }
 
-				const panel = await client.panels.get("Teams and Vote Winner")(client, match);
 				winnerVoteMessage.edit({
-					components: [panel],
+					components: [client.panels.get("Teams and Vote Winner")(client, match)],
 					flags: MessageFlags.IsComponentsV2,
 					allowedMentions: { parse: [] },
 				}).catch(console.error);

@@ -2,7 +2,7 @@ const { ContainerBuilder, ButtonStyle, ButtonBuilder, Collection, MessageFlags }
 
 module.exports = {
 	name: "In-House Queue",
-	async getContainer(client) {
+	getContainer(client) {
 		const queue = client.queue;
 
 		async function setupButtons() {
@@ -69,7 +69,7 @@ module.exports = {
 				});
 			}
 		}
-		await setupButtons();
+		setupButtons();
 
 		// strings
 		const rolePlayers = new Collection();

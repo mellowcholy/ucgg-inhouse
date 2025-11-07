@@ -23,9 +23,8 @@ module.exports = {
 					await client.latestInhousePost.delete().catch(console.error);
 				}
 
-				const panel = await client.panels.get("In-House Queue")(client);
 				await channel.send({
-					components: [panel],
+					components: [client.panels.get("In-House Queue")(client)],
 					flags: MessageFlags.IsComponentsV2,
 					allowedMentions: { parse: [] },
 				}).then(msg => client.latestInhousePost = msg);

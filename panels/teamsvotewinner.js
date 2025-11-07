@@ -2,7 +2,7 @@ const { ContainerBuilder, ButtonStyle, ButtonBuilder, MessageFlags } = require("
 
 module.exports = {
 	name: "Teams and Vote Winner",
-	async getContainer(client, match) {
+	getContainer(client, match) {
 		const matchId = match.get("number");
 		const winner_vote = client.config.winner_vote;
 
@@ -101,7 +101,7 @@ module.exports = {
 				}
 			}
 		}
-		await setupButtons();
+		setupButtons();
 
 		const teams = match.get("teams");
 
