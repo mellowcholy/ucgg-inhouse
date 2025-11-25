@@ -35,7 +35,7 @@ module.exports = {
 		context.fillText(data.losses, 578, 392);
 
 		const games = data.wins + data.losses;
-		const winrate = (data.wins / games) * 100 + "%";
+		const winrate = Math.round((data.wins / games) * 100) + "%";
 
 		context.fillText(winrate, 578, 443);
 		context.fillText(data.mvps, 578, 494);

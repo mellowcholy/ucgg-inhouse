@@ -40,7 +40,7 @@ module.exports = {
 		context.fillText(data.losses, canvas.width - 209, 385);
 
 		const games = data.wins + data.losses;
-		const winrate = (data.wins / games) * 100 + "%";
+		const winrate = Math.round((data.wins / games) * 100) + "%";
 
 		context.fillText(winrate, canvas.width - 248, 433);
 		context.fillText(data.mvps, canvas.width - 174, 482);
