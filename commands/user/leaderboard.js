@@ -19,13 +19,72 @@ module.exports = {
 			))
 		.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
-		await interaction.deferReply();
+		const msg = await interaction.deferReply();
 
 		const client = interaction.client;
 		const stat = interaction.options.getString("stat");
 		const pageNum = 0;
 
-		const panel = await client.panels.get("Leaderboard")(client, stat, pageNum, interaction);
-		await interaction.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error); return;
+		// DATA
+		const leaderboard = [];
+		for await (const [key, value] of client.keyv.iterator()) {
+			if (!value.mmrs) { continue; }
+
+			leaderboard.push([key, value]);
+    	};
+
+		const key = stat;
+		let label = "";
+		let mmr = false;
+
+		switch (stat) {
+		case "wins":
+		case "losses":
+		case "mvps":
+			label = stat.charAt(0).toUpperCase() + stat.slice(1);
+			break;
+		case "points":
+			label = "Credits";
+			break;
+		case "Top":
+		case "Jungle":
+		case "Mid":
+		case "Bot":
+		case "Support":
+			label = stat;
+			mmr = true;
+			break;
+		}
+
+		const sorted = leaderboard.sort(([, a], [, b]) => mmr ? b["mmrs"][key] - a["mmrs"][key] : b[key] - a[key]);
+		const pages = [];
+
+		let page = [];
+		let counter = 1;
+		for (let i = 0; i < sorted.length; i++) {
+			page.push([i + 1, sorted[i]]);
+
+			if (counter == 6) {
+				pages.push(page);
+				page = [];
+				counter = 0;
+			}
+
+			counter++;
+		}
+
+		if (page.length > 0) { pages.push(page); }
+
+		const maxPages = pages.length;
+
+		const statList = { label: label, maxPages: maxPages, pages: pages, mmr: mmr, key: key };
+
+		const panel = await client.panels.get("Leaderboard")(client, statList, pageNum, interaction, msg.id);
+		const board = await interaction.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
+
+		client.leaderboards.set(board.id, { num: pageNum, stat: stat });
+		client.leaderboardsStats.set(board.id, statList);
+
+		return;
 	},
 };

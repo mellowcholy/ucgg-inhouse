@@ -4,19 +4,22 @@ const { request } = require('undici');
 
 module.exports = {
 	name: "Leaderboard",
-	async getContainer(client, stat, pagenumber = 0, interaction) {
+	async getContainer(client, statList, pagenumber = 0, interaction) {
 		// buttons
-		let num = pagenumber;
-
 		async function setupButtons() {
 			client.buttons.set("prevPage", PreviousPage);
 			async function PreviousPage(int) {
 				await int.deferReply({ flags: MessageFlags.Ephemeral });
 
-				num--;
-				num = Math.max(0, num);
+				const state = client.leaderboards.get(int.message.id);
+				const stats = client.leaderboardsStats.get(int.message.id);
+				if (!state || !stats) { throw e; }
 
-				const pnl = await DrawLeaderboard(num);
+				state.num--;
+				state.num = Math.max(0, state.num);
+				client.leaderboards.set(int.message.id, state);
+
+				const pnl = await DrawLeaderboard(state.num, stats);
 				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] });
 
 				await int.deleteReply();
@@ -26,10 +29,15 @@ module.exports = {
 			async function NextPage(int) {
 				await int.deferReply({ flags: MessageFlags.Ephemeral });
 
-				num++;
-				num = Math.min(maxPages - 1, num);
+				const state = client.leaderboards.get(int.message.id);
+				const stats = client.leaderboardsStats.get(int.message.id);
+				if (!state || !stats) { throw e; }
 
-				const pnl = await DrawLeaderboard(num);
+				state.num++;
+				state.num = Math.min(stats.maxPages - 1, state.num);
+				client.leaderboards.set(int.message.id, state);
+
+				const pnl = await DrawLeaderboard(state.num, stats);
 				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] });
 
 				await int.deleteReply();
@@ -37,59 +45,7 @@ module.exports = {
 		}
 		setupButtons();
 
-		// DATA
-		const leaderboard = [];
-		for await (const [key, value] of client.keyv.iterator()) {
-			if (!value.mmrs) { continue; }
-
-			leaderboard.push([key, value]);
-    	};
-
-		const key = stat;
-		let label = "";
-		let mmr = false;
-
-		switch (stat) {
-		case "wins":
-		case "losses":
-		case "mvps":
-			label = stat.charAt(0).toUpperCase() + stat.slice(1);
-			break;
-		case "points":
-			label = "Credits";
-			break;
-		case "Top":
-		case "Jungle":
-		case "Mid":
-		case "Bot":
-		case "Support":
-			label = stat;
-			mmr = true;
-			break;
-		}
-
-		const sorted = leaderboard.sort(([, a], [, b]) => mmr ? b["mmrs"][key] - a["mmrs"][key] : b[key] - a[key]);
-		const pages = [];
-
-		let page = [];
-		let counter = 1;
-		for (let i = 0; i < sorted.length; i++) {
-			page.push([i + 1, sorted[i]]);
-
-			if (counter == 6) {
-				pages.push(page);
-				page = [];
-				counter = 0;
-			}
-
-			counter++;
-		}
-
-		if (page.length > 0) { pages.push(page); }
-
-		const maxPages = pages.length;
-
-		async function DrawLeaderboard(pn) {
+		async function DrawLeaderboard(pn, stats) {
 			// create leaderboard image
 			const canvas = Canvas.createCanvas(825, 620);
 			const context = canvas.getContext("2d");
@@ -106,7 +62,7 @@ module.exports = {
 			context.font = 'bold 30px Bahnschrift';
 			context.fillStyle = '#1e1d1b';
 			context.textAlign = "center";
-			context.fillText(`In House - ${label}`, 413, 60);
+			context.fillText(`In House - ${stats.label}`, 413, 60);
 
 			async function getAvatar(member) {
 				const avatarURL = member.displayAvatarURL({ extension: 'jpg' });
@@ -153,7 +109,7 @@ module.exports = {
 				context.restore();
 			};
 
-			const memberIds = pages[pn].map(val => val[1][0]);
+			const memberIds = stats.pages[pn].map(val => val[1][0]);
 			const members = await Promise.all(
 				memberIds.map(async id => {
 					const cached = interaction.client.users.cache.get(id);
@@ -172,10 +128,10 @@ module.exports = {
 			let yPos = 92;
 			const drawPromises = [];
 
-			for (let i = 0; i < pages[pn].length; i++) {
-				const entry = pages[pn][i];
+			for (let i = 0; i < stats.pages[pn].length; i++) {
+				const entry = stats.pages[pn][i];
 				const position = entry[0];
-				const value = mmr ? entry[1][1]["mmrs"][key] : entry[1][1][key];
+				const value = stats.mmr ? entry[1][1]["mmrs"][stats.key] : entry[1][1][stats.key];
 
 				if (members[i] == null) { continue; }
 
@@ -192,13 +148,13 @@ module.exports = {
 			const container = new ContainerBuilder()
 				.setAccentColor(0xac9cff)
 				.addActionRowComponents((actionRow) => actionRow.setComponents(
-					new ButtonBuilder().setCustomId("prevPage").setLabel('<- Page').setStyle(ButtonStyle.Secondary).setDisabled(num == 0 ? true : false),
-					new ButtonBuilder().setCustomId("nextPage").setLabel('Page ->').setStyle(ButtonStyle.Secondary).setDisabled(num == maxPages - 1 ? true : false),
+					new ButtonBuilder().setCustomId("prevPage").setLabel('<- Page').setStyle(ButtonStyle.Secondary).setDisabled(pn == 0 ? true : false),
+					new ButtonBuilder().setCustomId("nextPage").setLabel('Page ->').setStyle(ButtonStyle.Secondary).setDisabled(pn == stats.maxPages - 1 ? true : false),
 				));
 
 			return [container, gallery, attachment];
 		}
 
-		return DrawLeaderboard(pagenumber);
+		return DrawLeaderboard(pagenumber, statList);
 	},
 };

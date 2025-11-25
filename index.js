@@ -84,5 +84,9 @@ client.enqueue = function(key, task) {
 	client.spamQueue.set(key, next);
 };
 
+// handle leaderboard instances
+client.leaderboards = new Collection();
+client.leaderboardsStats = new Collection();
+
 // login
 client.login(config.token);
