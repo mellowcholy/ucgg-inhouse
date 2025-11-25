@@ -155,7 +155,18 @@ module.exports = {
 
 			const memberIds = pages[pn].map(val => val[1][0]);
 			const members = await Promise.all(
-				memberIds.map(async id => interaction.guild.members.cache.get(id) || interaction.guild.members.fetch(id)),
+				memberIds.map(async id => {
+					const cached = interaction.guild.members.cache.get(id);
+					if (cached) { return cached; }
+
+					try {
+						return await interaction.guild.members.fetch(id);
+					}
+					// eslint-disable-next-line no-unused-vars
+					catch (e) {
+						return null;
+					}
+				}),
 			);
 
 			let yPos = 92;
@@ -165,6 +176,8 @@ module.exports = {
 				const entry = pages[pn][i];
 				const position = entry[0];
 				const value = mmr ? entry[1][1]["mmrs"][key] : entry[1][1][key];
+
+				if (members[i] == null) { continue; }
 
 				drawPromises.push(drawUser(members[i], yPos, position, value));
 
