@@ -131,7 +131,13 @@ module.exports = {
 			for (let i = 0; i < stats.pages[pn].length; i++) {
 				const entry = stats.pages[pn][i];
 				const position = entry[0];
-				const value = stats.mmr ? entry[1][1]["mmrs"][stats.key] : entry[1][1][stats.key];
+				let value;
+				if (stats.average) {
+					value = entry[1][1];
+				}
+				else {
+					value = stats.mmr ? entry[1][1]["mmrs"][stats.key] : entry[1][1][stats.key];
+				}
 
 				if (members[i] == null) { continue; }
 

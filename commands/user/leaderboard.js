@@ -15,7 +15,7 @@ module.exports = {
 				{ name: "Mid MMR", value: "Mid" },
 				{ name: "Bot MMR", value: "Bot" },
 				{ name: "Support MMR", value: "Support" },
-
+				{ name: "Average MMR", value: "average" },
 			))
 		.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
@@ -36,6 +36,7 @@ module.exports = {
 		const key = stat;
 		let label = "";
 		let mmr = false;
+		let average = false;
 
 		switch (stat) {
 		case "wins":
@@ -45,6 +46,10 @@ module.exports = {
 			break;
 		case "points":
 			label = "Credits";
+			break;
+		case "average":
+			label = "Average MMR";
+			average = true;
 			break;
 		case "Top":
 		case "Jungle":
@@ -56,7 +61,29 @@ module.exports = {
 			break;
 		}
 
-		const sorted = leaderboard.sort(([, a], [, b]) => mmr ? b["mmrs"][key] - a["mmrs"][key] : b[key] - a[key]);
+		let sorted;
+		if (average) {
+			sorted = [];
+
+			for (let i = 0; i < leaderboard.length; i++) {
+				const mmrs = leaderboard[i][1]["mmrs"];
+				let avg = 0;
+
+				Object.values(mmrs).forEach(value => {
+					avg += value;
+				});
+
+				avg = Math.round(avg / 5);
+
+				sorted.push([leaderboard[i][0], avg]);
+			}
+
+			sorted = sorted.sort((a, b) => b[1] - a[1]);
+		}
+		else {
+			sorted = leaderboard.sort(([, a], [, b]) => mmr ? b["mmrs"][key] - a["mmrs"][key] : b[key] - a[key]);
+		}
+
 		const pages = [];
 
 		let page = [];
@@ -77,7 +104,7 @@ module.exports = {
 
 		const maxPages = pages.length;
 
-		const statList = { label: label, maxPages: maxPages, pages: pages, mmr: mmr, key: key };
+		const statList = { label: label, maxPages: maxPages, pages: pages, mmr: mmr, key: key, average: average };
 
 		const panel = await client.panels.get("Leaderboard")(client, statList, pageNum, interaction, msg.id);
 		const board = await interaction.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
