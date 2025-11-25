@@ -156,11 +156,11 @@ module.exports = {
 			const memberIds = pages[pn].map(val => val[1][0]);
 			const members = await Promise.all(
 				memberIds.map(async id => {
-					const cached = interaction.guild.members.cache.get(id);
+					const cached = interaction.client.users.cache.get(id);
 					if (cached) { return cached; }
 
 					try {
-						return await interaction.guild.members.fetch(id);
+						return await interaction.client.users.fetch(id);
 					}
 					// eslint-disable-next-line no-unused-vars
 					catch (e) {
