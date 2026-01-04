@@ -41,7 +41,7 @@ module.exports = {
 						flags: MessageFlags.Ephemeral,
 					});
 
-					if (winnerVotesBlue.length == winner_vote) {
+					if (winnerVotesBlue.length >= winner_vote) {
 						await client.winnerResult(match, true);
 					}
 					else {
@@ -86,7 +86,7 @@ module.exports = {
 						flags: MessageFlags.Ephemeral,
 					});
 
-					if (winnerVotesRed.length == winner_vote) {
+					if (winnerVotesRed.length >= winner_vote) {
 						await client.winnerResult(match, false);
 					}
 					else {
