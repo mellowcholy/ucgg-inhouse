@@ -1,0 +1,36 @@
+const { SlashCommandBuilder, PermissionFlagsBits, InteractionContextType, MessageFlags } = require("discord.js");
+
+module.exports = {
+	data: new SlashCommandBuilder()
+		.setName("remove")
+		.setDescription("Remove someone from the queue.")
+		.addUserOption((option) => option.setName("target").setDescription("The member to remove.").setRequired(true))
+		.setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
+		.setContexts(InteractionContextType.Guild),
+	async execute(interaction) {
+		await interaction.deferReply();
+
+		const client = interaction.client;
+		const target = interaction.options.getUser("target");
+		const userId = target.id;
+
+		const result = await client.LeaveQueue(userId);
+		await client.RefreshInHousePost();
+
+		switch (result) {
+		case 0:
+			await interaction.editReply({
+				content: `<@${target.id}> has been removed from the queue.`,
+				flags: MessageFlags.Ephemeral,
+			}).catch(console.error);
+			return;
+
+		case 1:
+			await interaction.editReply({
+				content: `<@${target.id}> is not in the queue.`,
+				flags: MessageFlags.Ephemeral,
+			}).catch(console.error);
+			return;
+		}
+	},
+};
