@@ -10,7 +10,7 @@ module.exports = {
 
 			positions.forEach(pos => {
 				client.buttons.set("join" + pos, async (interaction) => {
-					const result = client.JoinQueue(interaction.user.id, pos);
+					const result = await client.JoinQueue(interaction.user.id, pos);
 
 					switch (result) {
 					case 0:
@@ -33,6 +33,24 @@ module.exports = {
 							flags: MessageFlags.Ephemeral,
 						});
 						return;
+
+					case 3:
+						await interaction.reply({
+							content: 'You have been banned from the in-house queue. Please make a ticket to appeal this ban.',
+							flags: MessageFlags.Ephemeral,
+						});
+						return;
+
+					case 4: {
+						const db = client.keyv;
+						const banInfo = await db.get(`ban_${interaction.user.id}`);
+
+						await interaction.reply({
+							content: `You have been banned from the in-house queue until <t:${banInfo}:R>. Please make a ticket to appeal this ban.`,
+							flags: MessageFlags.Ephemeral,
+						});
+						return;
+					}
 					}
 				});
 			});

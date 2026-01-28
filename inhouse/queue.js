@@ -32,9 +32,23 @@ module.exports = {
 		};
 
 		// create join queue func
-		client.JoinQueue = function(userId, position) {
+		client.JoinQueue = async function(userId, position) {
 			const queue = client.queue;
 			const queuePos = queue.get(position);
+
+			// check if they are banned
+			const db = client.keyv;
+			const banInfo = await db.get(`ban_${userId}`);
+
+			if (banInfo) {
+				if (banInfo == true) {
+					return 3;
+				}
+				else {
+					return 4;
+				}
+			}
+
 
 			// check if they are in a match
 			for (const [, match] of client.matches) {

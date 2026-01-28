@@ -15,14 +15,13 @@ module.exports = {
 		const userId = target.id;
 
 		const result = await client.LeaveQueue(userId);
-		await client.RefreshInHousePost();
 
 		switch (result) {
 		case 0:
 			await interaction.editReply({
 				content: `<@${target.id}> has been removed from the queue.`,
 				flags: MessageFlags.Ephemeral,
-			}).catch(console.error);
+			}).catch(console.error).then(client.RefreshInHousePost());
 			return;
 
 		case 1:
