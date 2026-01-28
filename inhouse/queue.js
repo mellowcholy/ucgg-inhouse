@@ -64,6 +64,24 @@ module.exports = {
 			return 1;
 		};
 
+		client.LeaveQueue = function(userId) {
+			const queue = client.queue;
+			let bool = false;
+
+			queue.each(async val => {
+				const isUserId = (v) => v == userId;
+				const found = val.findIndex(isUserId);
+
+				if (found == -1) { return; }
+
+				val.splice(found, 1);
+
+				bool = true;
+			});
+
+			return bool ? 0 : 1;
+		};
+
 		function CheckQueuePop() {
 			const queue = client.queue;
 
