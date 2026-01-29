@@ -367,7 +367,7 @@ module.exports = {
 			const winner = result ? teams["blueSide"] : teams["redSide"];
 			const loser = result ? teams["redSide"] : teams["blueSide"];
 
-			await client.keyv.set("matchNum", number);
+			// await client.keyv.set("matchNum", number);
 
 			// winner
 			for (const [role, player] of winner) {
