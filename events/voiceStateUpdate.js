@@ -47,6 +47,8 @@ module.exports = {
 
 			waitingRoomPing.edit(pingString).catch(console.error);
 
+			console.log(waitingOn.length);
+
 			if (waitingOn.length == client.config.waiting_on) { client.BeginMatch(match); }
 		});
 	},

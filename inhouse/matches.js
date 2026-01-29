@@ -325,6 +325,16 @@ module.exports = {
 			match.delete("waitingRoom");
 		}
 
+		client.setWinner = async function(number, result) {
+			const match = client.matches.get(number);
+
+			if (match == null) { return 0; }
+
+			await client.winnerResult(match, result);
+
+			return 1;
+		};
+
 		client.winnerResult = async function(match, result) {
 			// result -> true = blue side | false -> red side
 

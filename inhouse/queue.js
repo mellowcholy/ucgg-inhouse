@@ -107,7 +107,7 @@ module.exports = {
 				count += val;
 			}
 
-			if (count == 10) {
+			if (count == 1) {
 				QueuePop();
 			}
 		}
