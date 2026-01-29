@@ -45,6 +45,12 @@ module.exports = {
 				redVc.delete();
 			}
 
+			// delete role
+			const role = match.get("role");
+			if (role != null) {
+				role.delete();
+			}
+
 			client.matches.delete(number);
 
 			return 1;
@@ -368,6 +374,11 @@ module.exports = {
 			const redVc = match.get("redVc");
 			redVc.delete();
 			match.delete("redVc");
+
+			// delete role
+			const role = match.get("role");
+			role.delete();
+			match.delete("role");
 
 			match.delete("winnerVoteMsg");
 

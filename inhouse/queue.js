@@ -1,4 +1,4 @@
-const { MessageFlags, Collection, ChannelType, time, TimestampStyles } = require('discord.js');
+const { MessageFlags, Collection, ChannelType, time, TimestampStyles, Colors } = require('discord.js');
 
 module.exports = {
 	run(client) {
@@ -184,6 +184,24 @@ module.exports = {
 
 			match.set("textChannel", textChannel);
 			match.set("waitingRoom", waitingRoom);
+
+			// make a new pingable role for all the players in this queue
+			const role = await guild.roles.create({
+				name: `Match ${matchId}`,
+				reason: "Pingable roles for this match",
+				colors: {
+					primaryColor: Colors.Blue,
+				},
+			}).catch(console.error);
+
+			match.set("role", role);
+
+			for (let i = 0; i < players.length; i++) {
+				const member = guild.members.cache.get(players[i]) || null;
+
+				if (member == null) { continue; }
+				member.roles.add(role);
+			}
 
 			setTimeout(() => client.cancelAfterDelay(matchId), 180 * 1000);
 			client.matches.set(matchId, match);
