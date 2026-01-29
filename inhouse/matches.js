@@ -222,7 +222,7 @@ module.exports = {
 			});
 		};
 
-		function PickModifier(items) {
+		client.PickModifier = function(items) {
 			const totalWeight = items.reduce((sum, i) => sum + i.weight, 0);
 			let r = Math.random() * totalWeight;
 
@@ -230,7 +230,7 @@ module.exports = {
 				r -= item.weight;
 				if (r < 0) return item.value;
 			}
-		}
+		};
 
 		client.wheelResult = function(match, result) {
 			if (match.get("wheel_locked")) { return; }
@@ -243,7 +243,7 @@ module.exports = {
 
 			if (result) {
 
-				channel.send(`The random modifier for this game is: ${PickModifier(modifiers)}`);
+				channel.send(`The random modifier for this game is: ${client.PickModifier(modifiers.modifiers)}`);
 			}
 			else {
 				channel.send("The wheel will not be spun.");
