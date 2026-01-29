@@ -376,8 +376,8 @@ module.exports = {
 			match.delete("redVc");
 
 			// delete role
-			const role = match.get("role");
-			role.delete();
+			const dsRole = match.get("role");
+			dsRole.delete();
 			match.delete("role");
 
 			match.delete("winnerVoteMsg");
