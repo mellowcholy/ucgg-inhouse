@@ -6,44 +6,25 @@ module.exports = {
 	name: "Category Shop",
 	async getContainer(client, category, interaction) {
 		// buttons
+		const buttons = [];
+		buttons.push(new ButtonBuilder().setCustomId("categoryshop_prevPage").setLabel("<-").setStyle(ButtonStyle.Secondary));
 		async function setupButtons() {
-			client.buttons.set("prevPage", PreviousPage);
-			async function PreviousPage(int) {
-				await int.deferReply({ flags: MessageFlags.Ephemeral });
+			for (let i = 0; i < shopItems[category].length; i++) {
+				const buttonName = `${shopItems[category][i].name}_button`;
 
-				const state = client.leaderboards.get(int.message.id);
-				const stats = client.leaderboardsStats.get(int.message.id);
-				if (!state || !stats) { throw e; }
+				buttons.push(new ButtonBuilder().setCustomId(buttonName).setLabel(shopItems[category][i].name).setStyle(ButtonStyle.Secondary));
 
-				state.num--;
-				state.num = Math.max(0, state.num);
-				client.leaderboards.set(int.message.id, state);
+				async function Button(int) {
+					await int.deferReply({ flags: MessageFlags.Ephemeral });
 
-				const pnl = await DrawLeaderboard(state.num, stats);
-				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] });
+					await int.editReply("Yeah it works").catch(console.error);
+				}
 
-				await int.deleteReply();
-			}
-
-			client.buttons.set("nextPage", NextPage);
-			async function NextPage(int) {
-				await int.deferReply({ flags: MessageFlags.Ephemeral });
-
-				const state = client.leaderboards.get(int.message.id);
-				const stats = client.leaderboardsStats.get(int.message.id);
-				if (!state || !stats) { throw e; }
-
-				state.num++;
-				state.num = Math.min(stats.maxPages - 1, state.num);
-				client.leaderboards.set(int.message.id, state);
-
-				const pnl = await DrawLeaderboard(state.num, stats);
-				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] });
-
-				await int.deleteReply();
+				client.buttons.set(buttonName, Button);
 			}
 		}
-		setupButtons();
+		await setupButtons();
+		buttons.push(new ButtonBuilder().setCustomId("categoryshop_nextPage").setLabel("->").setStyle(ButtonStyle.Secondary));
 
 		async function DrawShop() {
 			// create shop image
@@ -73,7 +54,10 @@ module.exports = {
 				context.font = '24px Bahnschrift';
 				context.fillStyle = '#1b2159';
 
-				context.fillText(`${description}`, 59, y + 88);
+				const lines = client.getLines(context, description, 743 - 59);
+				for (let i = 0; i < lines.length; i++) {
+					context.fillText(lines[i], 59, y + 88 + (i * 24));
+				}
 
 				// cost
 				context.font = '24px Cyber Angel';
@@ -99,13 +83,7 @@ module.exports = {
 			const gallery = new MediaGalleryBuilder().addItems(mediaGalleryItem => mediaGalleryItem.setURL("attachment://shop.png"));
 			const container = new ContainerBuilder()
 				.setAccentColor(0xac9cff)
-				.addActionRowComponents((actionRow) => actionRow.setComponents(
-					new ButtonBuilder().setCustomId("134rdfg").setLabel('<-').setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder().setCustomId("nextPa234erfge").setLabel('test item').setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder().setCustomId("next23sdfsdagPage").setLabel('test item').setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder().setCustomId("nextPsdfg4536age").setLabel('test item').setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder().setCustomId("nextP213214fdsage").setLabel('->').setStyle(ButtonStyle.Secondary),
-				));
+				.addActionRowComponents((actionRow) => actionRow.setComponents(buttons));
 
 			return [container, gallery, attachment];
 		}
