@@ -1,0 +1,25 @@
+{
+   "profiles": [
+      {
+         "name": "Y2K Black",
+         "cost": 100,
+         "description": "This is a test description!! yay!!",
+         "value": "y2k_black.js"
+      },
+      {
+         "name": "Terminal Black",
+         "cost": 100,
+         "description": "This is a test description!! yay!!",
+         "value": "terminal_black.js"
+      },
+      {
+         "name": "Y2K Green",
+         "cost": 100,
+         "description": "This is a test description!! yay!!",
+         "value": "y2k_green.js"
+      }
+   ],
+   "roles": [2],
+   "tickets": [3],
+   "black market": [4]
+}
