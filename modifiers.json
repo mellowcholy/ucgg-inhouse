@@ -60,7 +60,7 @@
 
       { "value": "[INSANITY!] Mortal Reminder. (If you die, leave the game)", "weight": 0.125},
       { "value": "[INSANITY!] The Price of Living. (If you die, you must sell an item in your inventory) (Cannot be wards/potions)", "weight": 0.125},
-      { "value": "[INSANITY!] Musical Lanes! (After 5 minutes, you must rotate lanes) (Blue side goes downwards, Red side goes upwards)", "weight": 0.125},
+      { "value": "[INSANITY!] Musical Lanes! (Every 5 minutes, you must rotate lanes (Until two towers are destroyed)) (Blue side goes downwards, Red side goes upwards)", "weight": 0.125},
       { "value": "[INSANITY!] Ultimate Addict! (You must use your ultimate off cooldown, no matter what)", "weight": 0.125},
       { "value": "[INSANITY!] Solidarity! (If someone on your team flashes, everyone else must flash ASAP)", "weight": 0.125},
       { "value": "[INSANITY!] ADC Protection Program! (If your ADC dies, everyone else on the team must die)", "weight": 0.125},
