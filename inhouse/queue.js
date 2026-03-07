@@ -49,6 +49,8 @@ module.exports = {
 				}
 			}
 
+			// check if mmr needs to be set
+			const ply = await client.LoadPlayer(userId);
 			if (ply.mmrs["Top"] == 0) {
 				return 5;
 			}
