@@ -11,11 +11,11 @@ module.exports = {
 			data["mvps"] = 0;
 			data["items"] = new Array();
 			data["mmrs"] = {
-				"Top": 1000,
-				"Jungle": 1000,
-				"Mid": 1000,
-				"Bot": 1000,
-				"Support": 1000,
+				"Top": 0,
+				"Jungle": 0,
+				"Mid": 0,
+				"Bot": 0,
+				"Support": 0,
 			};
 			data["profile"] = "modern_white";
 

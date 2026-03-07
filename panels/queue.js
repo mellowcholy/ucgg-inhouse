@@ -51,6 +51,13 @@ module.exports = {
 						});
 						return;
 					}
+
+					case 5:
+						await interaction.reply({
+							content: 'Your MMR has not been set. Please contact a moderator if you would like to play!',
+							flags: MessageFlags.Ephemeral,
+						});
+						return;
 					}
 				});
 			});

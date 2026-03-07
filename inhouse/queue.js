@@ -49,6 +49,9 @@ module.exports = {
 				}
 			}
 
+			if (ply.mmrs["Top"] == 0) {
+				return 5;
+			}
 
 			// check if they are in a match
 			for (const [, match] of client.matches) {
