@@ -6,41 +6,21 @@ module.exports = {
 	name: "Shop Main",
 	async getContainer(client, interaction) {
 		// buttons
+		const buttons = [];
 		async function setupButtons() {
-			client.buttons.set("prevPage", PreviousPage);
-			async function PreviousPage(int) {
-				await int.deferReply({ flags: MessageFlags.Ephemeral });
+			for (const [key] of Object.entries(shopItems)) {
+				const buttonName = `${key}_button`;
 
-				const state = client.leaderboards.get(int.message.id);
-				const stats = client.leaderboardsStats.get(int.message.id);
-				if (!state || !stats) { throw e; }
+				buttons.push(new ButtonBuilder().setCustomId(buttonName).setLabel(key.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ')).setStyle(ButtonStyle.Secondary));
 
-				state.num--;
-				state.num = Math.max(0, state.num);
-				client.leaderboards.set(int.message.id, state);
+				async function Button(int) {
+					await int.deferReply({ flags: MessageFlags.Ephemeral });
 
-				const pnl = await DrawLeaderboard(state.num, stats);
-				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] });
+					const panel = await client.panels.get("Category Shop")(client, key, int);
+					await int.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
+				}
 
-				await int.deleteReply();
-			}
-
-			client.buttons.set("nextPage", NextPage);
-			async function NextPage(int) {
-				await int.deferReply({ flags: MessageFlags.Ephemeral });
-
-				const state = client.leaderboards.get(int.message.id);
-				const stats = client.leaderboardsStats.get(int.message.id);
-				if (!state || !stats) { throw e; }
-
-				state.num++;
-				state.num = Math.min(stats.maxPages - 1, state.num);
-				client.leaderboards.set(int.message.id, state);
-
-				const pnl = await DrawLeaderboard(state.num, stats);
-				await int.message.edit({ components: [pnl[1], pnl[0]], flags: MessageFlags.IsComponentsV2, files: [pnl[2]] });
-
-				await int.deleteReply();
+				client.buttons.set(buttonName, Button);
 			}
 		}
 		setupButtons();
@@ -86,13 +66,7 @@ module.exports = {
 			const gallery = new MediaGalleryBuilder().addItems(mediaGalleryItem => mediaGalleryItem.setURL("attachment://shop.png"));
 			const container = new ContainerBuilder()
 				.setAccentColor(0xac9cff)
-				.addActionRowComponents((actionRow) => actionRow.setComponents(
-					new ButtonBuilder().setCustomId("134rdfg").setLabel('<-').setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder().setCustomId("nextPa234erfge").setLabel('test item').setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder().setCustomId("next23sdfsdagPage").setLabel('test item').setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder().setCustomId("nextPsdfg4536age").setLabel('test item').setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder().setCustomId("nextP213214fdsage").setLabel('->').setStyle(ButtonStyle.Secondary),
-				));
+				.addActionRowComponents((actionRow) => actionRow.setComponents(buttons));
 
 			return [container, gallery, attachment];
 		}

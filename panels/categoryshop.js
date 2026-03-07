@@ -58,25 +58,38 @@ module.exports = {
 
 			context.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-			async function drawItem(name, y) {
+			async function drawItem(name, cost, description, y) {
 				// background
 				context.drawImage(slot, 27, y);
 
-				context.font = '36px Cyber Angel';
-				context.fillStyle = '#5a3c78';
+				// name
+				context.font = 'bold 36px Bahnschrift';
+				context.fillStyle = '#3c4278';
 
 				context.textAlign = "left";
-				context.fillText(`${name}`, 72, y + 52);
+				context.fillText(`${name}`, 59, y + 56);
+
+				// description
+				context.font = '24px Bahnschrift';
+				context.fillStyle = '#1b2159';
+
+				context.fillText(`${description}`, 59, y + 88);
+
+				// cost
+				context.font = '24px Cyber Angel';
+				context.textAlign = "right";
+				context.fillText(`${cost}c`, 743, y + 56);
 			};
 
 			const drawPromises = [];
-			let yPos = 129;
+			let yPos = 45;
 
-			for (const [key] of Object.entries(shopItems)) {
+			for (let i = 0; i < shopItems[category].length; i++) {
+				const entry = shopItems[category][i];
 
-				drawPromises.push(drawItem(key, yPos));
+				drawPromises.push(drawItem(entry.name, entry.cost, entry.description, yPos));
 
-				yPos += 88;
+				yPos += (176 + 12);
 			}
 
 			await Promise.all(drawPromises);
