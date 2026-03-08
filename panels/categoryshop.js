@@ -12,7 +12,7 @@ module.exports = {
 			for (let i = 0; i < shopItems[category].length; i++) {
 				const buttonName = `${shopItems[category][i].name}_button`;
 
-				buttons.push(new ButtonBuilder().setCustomId(buttonName).setLabel(shopItems[category][i].name).setStyle(ButtonStyle.Secondary));
+				buttons.push(new ButtonBuilder().setCustomId(buttonName).setLabel(shopItems[category][i].name).setStyle(ButtonStyle.Primary));
 
 				async function Button(int) {
 					await int.deferReply({ flags: MessageFlags.Ephemeral });
