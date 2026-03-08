@@ -2,6 +2,15 @@ const { AttachmentBuilder, ContainerBuilder, ButtonStyle, ButtonBuilder, MediaGa
 const Canvas = require('@napi-rs/canvas');
 const { request } = require('undici');
 
+let background, slot;
+(async () => {
+	[background, slot] = await Promise.all([
+		Canvas.loadImage('./img/leaderboard.png'),
+		Canvas.loadImage('./img/leaderboard_slot.png'),
+	]);
+})();
+
+
 module.exports = {
 	name: "Leaderboard",
 	async getContainer(client, statList, pagenumber = 0, interaction) {
@@ -51,10 +60,6 @@ module.exports = {
 			const context = canvas.getContext("2d");
 			context.imageSmoothingEnabled = true;
 			context.imageSmoothingQuality = "low";
-			const [background, slot] = await Promise.all([
-				Canvas.loadImage('./img/leaderboard.png'),
-				Canvas.loadImage('./img/leaderboard_slot.png'),
-			]);
 
 			context.drawImage(background, 0, 0, canvas.width, canvas.height);
 

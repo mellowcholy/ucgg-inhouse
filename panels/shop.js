@@ -2,6 +2,14 @@ const { AttachmentBuilder, ContainerBuilder, ButtonStyle, ButtonBuilder, MediaGa
 const shopItems = require('../shop.json');
 const Canvas = require('@napi-rs/canvas');
 
+let background, slot;
+(async () => {
+	[background, slot] = await Promise.all([
+		Canvas.loadImage('./img/shop.png'),
+		Canvas.loadImage('./img/shop_slot.png'),
+	]);
+})();
+
 module.exports = {
 	name: "Shop Main",
 	async getContainer(client) {
@@ -37,7 +45,13 @@ module.exports = {
 					await int.deferReply({ flags: MessageFlags.Ephemeral });
 
 					const panel = await client.panels.get("Category Shop")(client, key, content, 0, int);
-					await int.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
+					const msg = await int.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
+
+					client.shops.set(msg.id, {
+						category: key,
+						content: content,
+						pageNumber: 0,
+					});
 				}
 
 				client.buttons.set(buttonName, Button);
@@ -51,10 +65,6 @@ module.exports = {
 			const context = canvas.getContext("2d");
 			context.imageSmoothingEnabled = true;
 			context.imageSmoothingQuality = "low";
-			const [background, slot] = await Promise.all([
-				Canvas.loadImage('./img/shop.png'),
-				Canvas.loadImage('./img/shop_slot.png'),
-			]);
 
 			context.drawImage(background, 0, 0, canvas.width, canvas.height);
 

@@ -1,6 +1,14 @@
 const { AttachmentBuilder, ContainerBuilder, ButtonStyle, ButtonBuilder, MediaGalleryBuilder, MessageFlags } = require("discord.js");
 const Canvas = require('@napi-rs/canvas');
 
+let background, slot;
+(async () => {
+	[background, slot] = await Promise.all([
+		Canvas.loadImage('./img/category_shop.png'),
+		Canvas.loadImage('./img/category_shop_slot.png'),
+	]);
+})();
+
 module.exports = {
 	name: "Category Shop",
 	async getContainer(client, category, content, pageNumber = 0, interaction) {
@@ -46,30 +54,30 @@ module.exports = {
 
 			client.buttons.set("categoryshop_prevPage", PreviousPage);
 			async function PreviousPage(int) {
-				await int.deferReply({ flags: MessageFlags.Ephemeral });
+				await int.deferUpdate();
 
-				if (pageNumber == 0) { await int.deleteReply(); return; }
+				const instance = client.shops.get(int.message.id);
 
-				pageNumber--;
+				if (instance.pageNumber == 0) { return; }
 
-				const panel = await client.panels.get("Category Shop")(client, category, content, pageNumber, interaction);
-				await interaction.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
+				instance.pageNumber--;
 
-				await int.deleteReply();
+				const panel = await client.panels.get("Category Shop")(client, instance.category, instance.content, instance.pageNumber, interaction);
+				await int.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
 			}
 
 			client.buttons.set("categoryshop_nextPage", NextPage);
 			async function NextPage(int) {
-				await int.deferReply({ flags: MessageFlags.Ephemeral });
+				await int.deferUpdate();
 
-				if (pageNumber == content.length - 1) { await int.deleteReply(); return; }
+				const instance = client.shops.get(int.message.id);
 
-				pageNumber++;
+				if (instance.pageNumber == content.length - 1) { return; }
 
-				const panel = await client.panels.get("Category Shop")(client, category, content, pageNumber, interaction);
-				await interaction.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
+				instance.pageNumber++;
 
-				await int.deleteReply();
+				const panel = await client.panels.get("Category Shop")(client, instance.category, instance.content, instance.pageNumber, interaction);
+				await int.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
 			}
 		}
 		await setupButtons();
@@ -81,10 +89,6 @@ module.exports = {
 			const context = canvas.getContext("2d");
 			context.imageSmoothingEnabled = true;
 			context.imageSmoothingQuality = "low";
-			const [background, slot] = await Promise.all([
-				Canvas.loadImage('./img/category_shop.png'),
-				Canvas.loadImage('./img/category_shop_slot.png'),
-			]);
 
 			context.drawImage(background, 0, 0, canvas.width, canvas.height);
 

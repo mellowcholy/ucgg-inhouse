@@ -88,6 +88,9 @@ client.enqueue = function(key, task) {
 client.leaderboards = new Collection();
 client.leaderboardsStats = new Collection();
 
+// handle shop instances
+client.shops = new Collection();
+
 // helper functions
 client.getLines = function(ctx, text, maxWidth) {
 	const words = text.split(" ");
