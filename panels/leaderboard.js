@@ -58,8 +58,7 @@ module.exports = {
 			// create leaderboard image
 			const canvas = Canvas.createCanvas(825, 620);
 			const context = canvas.getContext("2d");
-			context.imageSmoothingEnabled = true;
-			context.imageSmoothingQuality = "low";
+			context.imageSmoothingEnabled = false;
 
 			context.drawImage(background, 0, 0, canvas.width, canvas.height);
 
