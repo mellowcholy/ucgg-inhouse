@@ -19,7 +19,7 @@ module.exports = {
 			))
 		.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
-		const msg = await interaction.deferReply();
+		await interaction.deferReply();
 
 		const client = interaction.client;
 		const stat = interaction.options.getString("stat");
@@ -106,7 +106,7 @@ module.exports = {
 
 		const statList = { label: label, maxPages: maxPages, pages: pages, mmr: mmr, key: key, average: average };
 
-		const panel = await client.panels.get("Leaderboard")(client, statList, pageNum, interaction, msg.id);
+		const panel = await client.panels.get("Leaderboard")(client, statList, pageNum, interaction);
 		const board = await interaction.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
 
 		client.leaderboards.set(board.id, { num: pageNum, stat: stat });
