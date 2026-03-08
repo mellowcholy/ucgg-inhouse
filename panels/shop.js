@@ -4,7 +4,7 @@ const Canvas = require('@napi-rs/canvas');
 
 module.exports = {
 	name: "Shop Main",
-	async getContainer(client, interaction) {
+	async getContainer(client) {
 		// buttons
 		const buttons = [];
 		async function setupButtons() {

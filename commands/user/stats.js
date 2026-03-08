@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, InteractionContextType } = require("discord.js");
 const { Collection } = require('discord.js');
+const shopItems = require('../../shop.json');
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -31,7 +32,8 @@ module.exports = {
 		const data = await client.LoadPlayer(target.id);
 		const inventory = await client.LoadInventory(target.id);
 
-		const profile = profiles.get(inventory.equipped_profile + ".js");
+		console.log(inventory.equipped_profile);
+		const profile = profiles.get(shopItems.profiles[inventory.equipped_profile].value + ".js");
 
 		const attachment = await profile.create(target, data);
 

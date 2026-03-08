@@ -9,11 +9,13 @@ module.exports = {
 		const buttons = [];
 		buttons.push(new ButtonBuilder().setCustomId("categoryshop_prevPage").setLabel("<-").setStyle(ButtonStyle.Secondary));
 		async function setupButtons() {
-			for (let i = 0; i < shopItems[category].length; i++) {
-				const item = shopItems[category][i];
-				const buttonName = `${item.name}_button`;
+			for (const [name, item] of Object.entries(shopItems[category])) {
+				const buttonName = `${name}_button`;
 
-				buttons.push(new ButtonBuilder().setCustomId(buttonName).setLabel(shopItems[category][i].name).setStyle(ButtonStyle.Primary));
+				// TODO: REMOVE
+				if (name == "Terminal Green") { return; }
+
+				buttons.push(new ButtonBuilder().setCustomId(buttonName).setLabel(name).setStyle(ButtonStyle.Primary));
 
 				async function Button(int) {
 					await int.deferReply({ flags: MessageFlags.Ephemeral });
@@ -23,7 +25,7 @@ module.exports = {
 					const inventory = await client.LoadInventory(id);
 
 					// check if they have it
-					if (inventory[category].includes(item.name)) {
+					if (inventory[category].includes(name)) {
 						await int.editReply("You already own this item!").catch(console.error);
 						return;
 					}
@@ -34,13 +36,13 @@ module.exports = {
 						return;
 					}
 
-					inventory[category].push(item.name);
+					inventory[category].push(name);
 					data.points -= item.cost;
 
 					await client.SavePlayer(id, data);
 					await client.SaveInventory(id, inventory);
 
-					await int.editReply(`You have purchased ${item.name} for ${item.cost} credits!`).catch(console.error);
+					await int.editReply(`You have purchased ${name} for ${item.cost} credits!`).catch(console.error);
 				}
 
 				client.buttons.set(buttonName, Button);
@@ -108,10 +110,8 @@ module.exports = {
 			const drawPromises = [];
 			let yPos = 45;
 
-			for (let i = 0; i < shopItems[category].length; i++) {
-				const entry = shopItems[category][i];
-
-				drawPromises.push(drawItem(entry.name, entry.cost, entry.description, yPos));
+			for (const [name, item] of Object.entries(shopItems[category])) {
+				drawPromises.push(drawItem(name, item.cost, item.description, yPos));
 
 				yPos += (176 + 12);
 			}

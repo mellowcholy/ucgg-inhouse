@@ -26,11 +26,11 @@ module.exports = {
 		client.InitialiseInventory = async function(id) {
 			const inventory = {};
 
-			inventory["profiles"] = [];
+			inventory["profiles"] = ["Modern White"];
 			inventory["roles"] = [];
 			inventory["tickets"] = [];
 			inventory["black market"] = [];
-			inventory["equipped_profile"] = "modern_white";
+			inventory["equipped_profile"] = "Modern White";
 			inventory["equipped_role"] = "none";
 
 			await db.set(`${id}_inventory`, inventory);
