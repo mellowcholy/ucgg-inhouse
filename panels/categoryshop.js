@@ -44,10 +44,22 @@ module.exports = {
 				context.drawImage(slot, 27, y);
 
 				// name
-				context.font = 'bold 36px Bahnschrift';
-				context.fillStyle = '#3c4278';
-
+				context.font = '36px Cyber Angel';
 				context.textAlign = "left";
+
+				context.strokeStyle = '#3c4278';
+				context.lineWidth = 10;
+				context.strokeText(`${name}`, 59, y + 56);
+
+				const width = context.measureText(name).width;
+
+				const gradient = context.createLinearGradient(59, y + 30, 59 + width, y + 56);
+				gradient.addColorStop(0, "white");
+				gradient.addColorStop(0.45, "#b7caff");
+				gradient.addColorStop(0.55, "#dcc0ff");
+				gradient.addColorStop(1.0, "white");
+
+				context.fillStyle = gradient;
 				context.fillText(`${name}`, 59, y + 56);
 
 				// description
@@ -56,12 +68,17 @@ module.exports = {
 
 				const lines = client.getLines(context, description, 743 - 59);
 				for (let i = 0; i < lines.length; i++) {
-					context.fillText(lines[i], 59, y + 88 + (i * 24));
+					context.fillText(lines[i], 59, y + 90 + (i * 24));
 				}
 
 				// cost
 				context.font = '24px Cyber Angel';
 				context.textAlign = "right";
+
+				context.strokeStyle = '#1b2159';
+				context.strokeText(`${cost}c`, 743, y + 56);
+
+				context.fillStyle = "white";
 				context.fillText(`${cost}c`, 743, y + 56);
 			};
 

@@ -43,9 +43,21 @@ module.exports = {
 				context.drawImage(slot, 27, y);
 
 				context.font = '36px Cyber Angel';
-				context.fillStyle = '#5a3c78';
-
 				context.textAlign = "left";
+
+				context.strokeStyle = '#3f1c64';
+				context.lineWidth = 10;
+				context.strokeText(`${name}`, 72, y + 52);
+
+				const width = context.measureText(name).width;
+
+				const gradient = context.createLinearGradient(72, y + 26, 72 + width, y + 52);
+				gradient.addColorStop(0, "white");
+				gradient.addColorStop(0.45, "#fcb7ff");
+				gradient.addColorStop(0.55, "#dcc0ff");
+				gradient.addColorStop(1.0, "white");
+
+				context.fillStyle = gradient;
 				context.fillText(`${name}`, 72, y + 52);
 			};
 
