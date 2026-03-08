@@ -13,10 +13,30 @@ module.exports = {
 
 				buttons.push(new ButtonBuilder().setCustomId(buttonName).setLabel(key.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ')).setStyle(ButtonStyle.Secondary));
 
+				// setup shop pages
+				const content = [];
+				let counter = 0;
+				let page = {};
+
+				for (const [k, v] of Object.entries(shopItems[key])) {
+					page[k] = v;
+
+					if (counter == 2) {
+						content.push(page);
+
+						counter = 0;
+						page = {};
+					}
+
+					counter++;
+				}
+
+				if (Object.keys(page).length > 0) { content.push(page); }
+
 				async function Button(int) {
 					await int.deferReply({ flags: MessageFlags.Ephemeral });
 
-					const panel = await client.panels.get("Category Shop")(client, key, int);
+					const panel = await client.panels.get("Category Shop")(client, key, content, 0, int);
 					await int.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
 				}
 

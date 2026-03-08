@@ -1,18 +1,16 @@
 const { AttachmentBuilder, ContainerBuilder, ButtonStyle, ButtonBuilder, MediaGalleryBuilder, MessageFlags } = require("discord.js");
-const shopItems = require('../shop.json');
 const Canvas = require('@napi-rs/canvas');
 
 module.exports = {
 	name: "Category Shop",
-	async getContainer(client, category, interaction) {
+	async getContainer(client, category, content, pageNumber = 0, interaction) {
 		// buttons
 		const buttons = [];
-		buttons.push(new ButtonBuilder().setCustomId("categoryshop_prevPage").setLabel("<-").setStyle(ButtonStyle.Secondary));
+		buttons.push(new ButtonBuilder().setCustomId("categoryshop_prevPage").setLabel("<-").setStyle(ButtonStyle.Secondary).setDisabled(pageNumber == 0 ? true : false));
 		async function setupButtons() {
-			for (const [name, item] of Object.entries(shopItems[category])) {
+			for (const [name, item] of Object.entries(content[pageNumber])) {
 				const buttonName = `${name}_button`;
 
-				// TODO: REMOVE
 				if (name == "Terminal Green") { return; }
 
 				buttons.push(new ButtonBuilder().setCustomId(buttonName).setLabel(name).setStyle(ButtonStyle.Primary));
@@ -47,9 +45,37 @@ module.exports = {
 
 				client.buttons.set(buttonName, Button);
 			}
+
+			client.buttons.set("categoryshop_prevPage", PreviousPage);
+			async function PreviousPage(int) {
+				await int.deferReply({ flags: MessageFlags.Ephemeral });
+
+				if (pageNumber == 0) { await int.deleteReply(); return; }
+
+				pageNumber--;
+
+				const panel = await client.panels.get("Category Shop")(client, category, content, pageNumber, interaction);
+				await interaction.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
+
+				await int.deleteReply();
+			}
+
+			client.buttons.set("categoryshop_nextPage", NextPage);
+			async function NextPage(int) {
+				await int.deferReply({ flags: MessageFlags.Ephemeral });
+
+				if (pageNumber == content.length - 1) { await int.deleteReply(); return; }
+
+				pageNumber++;
+
+				const panel = await client.panels.get("Category Shop")(client, category, content, pageNumber, interaction);
+				await interaction.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
+
+				await int.deleteReply();
+			}
 		}
 		await setupButtons();
-		buttons.push(new ButtonBuilder().setCustomId("categoryshop_nextPage").setLabel("->").setStyle(ButtonStyle.Secondary));
+		buttons.push(new ButtonBuilder().setCustomId("categoryshop_nextPage").setLabel("->").setStyle(ButtonStyle.Secondary).setDisabled(pageNumber == content.length - 1 ? true : false));
 
 		async function DrawShop() {
 			// create shop image
@@ -110,7 +136,7 @@ module.exports = {
 			const drawPromises = [];
 			let yPos = 45;
 
-			for (const [name, item] of Object.entries(shopItems[category])) {
+			for (const [name, item] of Object.entries(content[pageNumber])) {
 				drawPromises.push(drawItem(name, item.cost, item.description, yPos));
 
 				yPos += (176 + 12);
