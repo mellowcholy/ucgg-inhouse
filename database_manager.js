@@ -29,7 +29,7 @@ module.exports = {
 			inventory["profiles"] = [];
 			inventory["roles"] = [];
 			inventory["tickets"] = [];
-			inventory["other"] = [];
+			inventory["black market"] = [];
 			inventory["equipped_profile"] = "modern_white";
 			inventory["equipped_role"] = "none";
 

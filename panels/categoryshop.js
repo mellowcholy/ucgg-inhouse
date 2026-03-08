@@ -10,14 +10,37 @@ module.exports = {
 		buttons.push(new ButtonBuilder().setCustomId("categoryshop_prevPage").setLabel("<-").setStyle(ButtonStyle.Secondary));
 		async function setupButtons() {
 			for (let i = 0; i < shopItems[category].length; i++) {
-				const buttonName = `${shopItems[category][i].name}_button`;
+				const item = shopItems[category][i];
+				const buttonName = `${item.name}_button`;
 
 				buttons.push(new ButtonBuilder().setCustomId(buttonName).setLabel(shopItems[category][i].name).setStyle(ButtonStyle.Primary));
 
 				async function Button(int) {
 					await int.deferReply({ flags: MessageFlags.Ephemeral });
 
-					await int.editReply("Yeah it works").catch(console.error);
+					const id = int.user.id;
+					const data = await client.LoadPlayer(id);
+					const inventory = await client.LoadInventory(id);
+
+					// check if they have it
+					if (inventory[category].includes(item.name)) {
+						await int.editReply("You already own this item!").catch(console.error);
+						return;
+					}
+
+					// check if they have enough credits
+					if (data.points < item.cost) {
+						await int.editReply("You do not have enough credits to buy this item!").catch(console.error);
+						return;
+					}
+
+					inventory[category].push(item.name);
+					data.points -= item.cost;
+
+					await client.SavePlayer(id, data);
+					await client.SaveInventory(id, inventory);
+
+					await int.editReply(`You have purchased ${item.name} for ${item.cost} credits!`).catch(console.error);
 				}
 
 				client.buttons.set(buttonName, Button);
