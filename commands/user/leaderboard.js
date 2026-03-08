@@ -112,6 +112,9 @@ module.exports = {
 		client.leaderboards.set(board.id, { num: pageNum, stat: stat });
 		client.leaderboardsStats.set(board.id, statList);
 
+		setTimeout(() => client.leaderboards.delete(board.id), 10 * 60 * 1000);
+		setTimeout(() => client.leaderboardsStats.delete(board.id), 10 * 60 * 1000);
+
 		return;
 	},
 };

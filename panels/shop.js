@@ -59,6 +59,8 @@ module.exports = {
 							content: pagedShop[k],
 							pageNumber: 0,
 						});
+
+						setTimeout(() => client.shops.delete(msg.id), 10 * 60 * 1000);
 					};
 				}
 
