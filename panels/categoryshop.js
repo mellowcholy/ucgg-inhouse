@@ -15,7 +15,7 @@ module.exports = {
 		// buttons
 		const buttons = [];
 		buttons.push(new ButtonBuilder().setCustomId("categoryshop_prevPage").setLabel("<-").setStyle(ButtonStyle.Primary).setDisabled(pageNumber == 0 ? true : false));
-		async function setupButtons() {
+		function setupButtons() {
 			for (const [name, item] of Object.entries(content[pageNumber])) {
 				const buttonName = `${name}_button`;
 
@@ -80,7 +80,7 @@ module.exports = {
 				await int.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
 			}
 		}
-		await setupButtons();
+		setupButtons();
 		buttons.push(new ButtonBuilder().setCustomId("categoryshop_nextPage").setLabel("->").setStyle(ButtonStyle.Primary).setDisabled(pageNumber == content.length - 1 ? true : false));
 
 		async function DrawShop() {

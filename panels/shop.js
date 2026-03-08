@@ -10,51 +10,59 @@ let background, slot;
 	]);
 })();
 
+// setup shop pages
+const pagedShop = {};
+
+for (const [key] of Object.entries(shopItems)) {
+	const content = [];
+	let counter = 0;
+	let page = {};
+
+	for (const [k, v] of Object.entries(shopItems[key])) {
+		page[k] = v;
+
+		if (counter == 2) {
+			content.push(page);
+
+			counter = 0;
+			page = {};
+		}
+
+		counter++;
+	}
+
+	if (Object.keys(page).length > 0) { content.push(page); }
+
+	pagedShop[key] = content;
+}
+
 module.exports = {
 	name: "Shop Main",
 	async getContainer(client) {
 		// buttons
 		const buttons = [];
-		async function setupButtons() {
+		function setupButtons() {
 			for (const [key] of Object.entries(shopItems)) {
 				const buttonName = `${key}_button`;
 
 				buttons.push(new ButtonBuilder().setCustomId(buttonName).setLabel(key.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ')).setStyle(ButtonStyle.Secondary));
 
-				// setup shop pages
-				const content = [];
-				let counter = 0;
-				let page = {};
+				function makeButton(k) {
+					return async function Button(int) {
+						await int.deferReply({ flags: MessageFlags.Ephemeral });
 
-				for (const [k, v] of Object.entries(shopItems[key])) {
-					page[k] = v;
+						const panel = await client.panels.get("Category Shop")(client, k, pagedShop[k], 0, int);
+						const msg = await int.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
 
-					if (counter == 2) {
-						content.push(page);
-
-						counter = 0;
-						page = {};
-					}
-
-					counter++;
+						client.shops.set(msg.id, {
+							category: k,
+							content: pagedShop[k],
+							pageNumber: 0,
+						});
+					};
 				}
 
-				if (Object.keys(page).length > 0) { content.push(page); }
-
-				async function Button(int) {
-					await int.deferReply({ flags: MessageFlags.Ephemeral });
-
-					const panel = await client.panels.get("Category Shop")(client, key, content, 0, int);
-					const msg = await int.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);
-
-					client.shops.set(msg.id, {
-						category: key,
-						content: content,
-						pageNumber: 0,
-					});
-				}
-
-				client.buttons.set(buttonName, Button);
+				client.buttons.set(buttonName, makeButton(key));
 			}
 		}
 		setupButtons();
