@@ -32,7 +32,6 @@ module.exports = {
 		const data = await client.LoadPlayer(target.id);
 		const inventory = await client.LoadInventory(target.id);
 
-		console.log(inventory.equipped_profile);
 		const profile = profiles.get(shopItems.profiles[inventory.equipped_profile].value + ".js");
 
 		const attachment = await profile.create(target, data);
