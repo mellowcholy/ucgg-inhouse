@@ -6,14 +6,12 @@ module.exports = {
 	async getContainer(client, category, content, pageNumber = 0, interaction) {
 		// buttons
 		const buttons = [];
-		buttons.push(new ButtonBuilder().setCustomId("categoryshop_prevPage").setLabel("<-").setStyle(ButtonStyle.Secondary).setDisabled(pageNumber == 0 ? true : false));
+		buttons.push(new ButtonBuilder().setCustomId("categoryshop_prevPage").setLabel("<-").setStyle(ButtonStyle.Primary).setDisabled(pageNumber == 0 ? true : false));
 		async function setupButtons() {
 			for (const [name, item] of Object.entries(content[pageNumber])) {
 				const buttonName = `${name}_button`;
 
-				if (name == "Terminal Green") { return; }
-
-				buttons.push(new ButtonBuilder().setCustomId(buttonName).setLabel(name).setStyle(ButtonStyle.Primary));
+				buttons.push(new ButtonBuilder().setCustomId(buttonName).setLabel(name).setStyle(ButtonStyle.Secondary));
 
 				async function Button(int) {
 					await int.deferReply({ flags: MessageFlags.Ephemeral });
@@ -75,7 +73,7 @@ module.exports = {
 			}
 		}
 		await setupButtons();
-		buttons.push(new ButtonBuilder().setCustomId("categoryshop_nextPage").setLabel("->").setStyle(ButtonStyle.Secondary).setDisabled(pageNumber == content.length - 1 ? true : false));
+		buttons.push(new ButtonBuilder().setCustomId("categoryshop_nextPage").setLabel("->").setStyle(ButtonStyle.Primary).setDisabled(pageNumber == content.length - 1 ? true : false));
 
 		async function DrawShop() {
 			// create shop image

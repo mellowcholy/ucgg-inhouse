@@ -18,7 +18,7 @@
       "Terminal Green": {
          "cost": 100,
          "description": "Profile in the style of a command prompt terminal. Black and green colour scheme.",
-         "value": "y2k_green"
+         "value": "terminal_green"
       }
    },
    "roles": [2],
