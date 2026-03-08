@@ -22,6 +22,18 @@
       }
    },
    "roles": [2],
-   "tickets": [3],
-   "black market": [4]
+   "tickets": {
+      "Coming Soon": {
+         "cost": 99999999999,
+         "description": "Please don't try and buy this...",
+         "value": "test"
+      }
+   },
+   "black market": {
+      "Coming Soon": {
+         "cost": 99999999999,
+         "description": "Please don't try and buy this...",
+         "value": "test"
+      }
+   }
 }
