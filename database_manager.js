@@ -17,28 +17,45 @@ module.exports = {
 				"Bot": 0,
 				"Support": 0,
 			};
-			data["profile"] = "modern_white";
 
-			await client.keyv.set(id, data);
+			await db.set(id, data);
 
 			return data;
+		};
+
+		client.InitialiseInventory = async function(id) {
+			const inventory = {};
+
+			inventory["profiles"] = [];
+			inventory["roles"] = [];
+			inventory["tickets"] = [];
+			inventory["other"] = [];
+			inventory["equipped_profile"] = "modern_white";
+			inventory["equipped_role"] = "none";
+
+			await db.set(`${id}_inventory`, inventory);
+
+			return inventory;
 		};
 
 		client.SavePlayer = async function(id, data) {
 			await db.set(id, data);
 		};
 
+		client.SaveInventory = async function(id, data) {
+			await db.set(`${id}_inventory`, data);
+		};
+
 		client.LoadPlayer = async function(id) {
 			let data = await db.get(id);
 			if (!data) { data = await client.InitialisePlayer(id); }
 
-			// setup later vars here;
-			let shouldSave = false;
-			if (!data.profile) { data["profile"] = "modern_white"; shouldSave = true; }
+			return data;
+		};
 
-			if (shouldSave) {
-				client.SavePlayer(id, data);
-			}
+		client.LoadInventory = async function(id) {
+			let data = await db.get(`${id}_inventory`);
+			if (!data) { data = await client.InitialiseInventory(id); }
 
 			return data;
 		};

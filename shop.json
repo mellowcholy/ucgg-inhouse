@@ -4,19 +4,19 @@
          "name": "Y2K Black",
          "cost": 100,
          "description": "Profile with Y2K aesthetics. Black, monochrome colour scheme.",
-         "value": "y2k_black.js"
+         "value": "y2k_black"
       },
       {
          "name": "Terminal Black",
          "cost": 100,
          "description": "Profile in the style of a command prompt terminal. Black and white colour scheme.",
-         "value": "terminal_black.js"
+         "value": "terminal_black"
       },
       {
          "name": "Terminal Green",
          "cost": 100,
          "description": "Profile in the style of a command prompt terminal. Black and green colour scheme.",
-         "value": "y2k_green.js"
+         "value": "y2k_green"
       }
    ],
    "roles": [2],

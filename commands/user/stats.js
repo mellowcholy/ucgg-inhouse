@@ -29,8 +29,9 @@ module.exports = {
 		const target = interaction.options.getUser("target") || interaction.user;
 
 		const data = await client.LoadPlayer(target.id);
+		const inventory = await client.LoadInventory(target.id);
 
-		const profile = profiles.get(data.profile + ".js");
+		const profile = profiles.get(inventory.equipped_profile + ".js");
 
 		const attachment = await profile.create(target, data);
 
