@@ -9,7 +9,7 @@ module.exports = {
 
 		const canvas = Canvas.createCanvas(825, 620);
 		const context = canvas.getContext("2d", { alpha: false });
-		const background = await Canvas.loadImage('./img/y2k_black.png');
+		const background = await Canvas.loadImage('./img/profiles/y2k_black.png');
 
 		context.drawImage(background, 0, 0, canvas.width, canvas.height);
 		context.drawImage(avatar, 95, 22, 133, 133);

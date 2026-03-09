@@ -5,7 +5,7 @@ module.exports = {
 	async create(target, data) {
 		const canvas = Canvas.createCanvas(825, 620);
 		const context = canvas.getContext("2d", { alpha: false });
-		const background = await Canvas.loadImage('./img/terminal_black.png');
+		const background = await Canvas.loadImage('./img/profiles/terminal_black.png');
 
 		context.drawImage(background, 0, 0, canvas.width, canvas.height);
 
