@@ -2,6 +2,12 @@ const { AttachmentBuilder } = require("discord.js");
 const Canvas = require('@napi-rs/canvas');
 const { request } = require('undici');
 
+let background;
+(async () => {
+	background = await Canvas.loadImage('./img/profiles/modern_white.png');
+})();
+
+
 module.exports = {
 	async create(target, data) {
 		const { body } = await request(target.displayAvatarURL({ extension: 'jpg' }));
@@ -9,7 +15,6 @@ module.exports = {
 
 		const canvas = Canvas.createCanvas(825, 620);
 		const context = canvas.getContext("2d", { alpha: false });
-		const background = await Canvas.loadImage('./img/profiles/modern_white.png');
 
 		context.drawImage(background, 0, 0, canvas.width, canvas.height);
 

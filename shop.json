@@ -77,6 +77,12 @@
          "value": "test",
          "gradient_start": "ebf4f5",
          "gradient_end": "b5c6e0"
+      },
+      "White Bow": {
+         "cost": 250,
+         "description": "A white bow icon next to your name.",
+         "value": "tes",
+         "icon": "./img/icons/white_bow.png"
       }
    },
    "tickets": {
