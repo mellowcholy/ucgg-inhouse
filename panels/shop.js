@@ -24,7 +24,7 @@ for (const [key] of Object.entries(shopItems)) {
 		if (counter == 2) {
 			content.push(page);
 
-			counter = 0;
+			counter = -1;
 			page = {};
 		}
 

@@ -6,7 +6,7 @@
          "value": "modern_white"
       },
       "Y2K Black": {
-         "cost": 100,
+         "cost": 250,
          "description": "Profile with Y2K aesthetics. Black, monochrome colour scheme.",
          "value": "y2k_black"
       },
@@ -21,7 +21,64 @@
          "value": "terminal_green"
       }
    },
-   "roles": [2],
+   "roles": {
+      "Neon Lagoon": {
+         "cost": 200,
+         "description": "A green/blue gradient coloured role.",
+         "value": "test",
+         "gradient_start": "00ff87",
+         "gradient_end": "60efff"
+      },
+      "Sunset Candy": {
+         "cost": 200,
+         "description": "A red/orange gradient coloured role.",
+         "value": "test",
+         "gradient_start": "ff0f7b",
+         "gradient_end": "f89b29"
+      },
+      "Digital Sky": {
+         "cost": 200,
+         "description": "A blue gradient coloured role.",
+         "value": "test",
+         "gradient_start": "0061ff",
+         "gradient_end": "60efff"
+      },
+      "Lavender Dream": {
+         "cost": 200,
+         "description": "A pink/purple gradient coloured role.",
+         "value": "test",
+         "gradient_start": "696eff",
+         "gradient_end": "f8acff"
+      },
+      "Citrus Shine": {
+         "cost": 200,
+         "description": "A orange/yellow gradient coloured role.",
+         "value": "test",
+         "gradient_start": "ff930f",
+         "gradient_end": "fff95b"
+      },
+      "Midnight Calm": {
+         "cost": 200,
+         "description": "A blue/dark blue gradient coloured role.",
+         "value": "test",
+         "gradient_start": "9bafd9",
+         "gradient_end": "103783"
+      },
+      "Crimson Silence": {
+         "cost": 200,
+         "description": "A red/black gradient coloured role.",
+         "value": "test",
+         "gradient_start": "c11e38",
+         "gradient_end": "220b34"
+      },
+      "Frosted Light": {
+         "cost": 200,
+         "description": "A white/grey gradient coloured role.",
+         "value": "test",
+         "gradient_start": "ebf4f5",
+         "gradient_end": "b5c6e0"
+      }
+   },
    "tickets": {
       "Coming Soon": {
          "cost": 99999999999,

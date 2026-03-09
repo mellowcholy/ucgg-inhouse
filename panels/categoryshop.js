@@ -91,7 +91,7 @@ module.exports = {
 
 			context.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-			async function drawItem(name, cost, description, y) {
+			async function drawItem(name, item, y) {
 				// background
 				context.drawImage(slot, 27, y);
 
@@ -106,10 +106,16 @@ module.exports = {
 				const width = context.measureText(name).width;
 
 				const gradient = context.createLinearGradient(59, y + 30, 59 + width, y + 56);
-				gradient.addColorStop(0, "white");
-				gradient.addColorStop(0.45, "#b7caff");
-				gradient.addColorStop(0.55, "#dcc0ff");
-				gradient.addColorStop(1.0, "white");
+				if (item.gradient_start) {
+					gradient.addColorStop(0, `#${item.gradient_start}`);
+					gradient.addColorStop(1.0, `#${item.gradient_end}`);
+				}
+				else {
+					gradient.addColorStop(0, "white");
+					gradient.addColorStop(0.45, "#b7caff");
+					gradient.addColorStop(0.55, "#dcc0ff");
+					gradient.addColorStop(1.0, "white");
+				}
 
 				context.fillStyle = gradient;
 				context.fillText(`${name}`, 59, y + 56);
@@ -118,7 +124,7 @@ module.exports = {
 				context.font = '24px Bahnschrift';
 				context.fillStyle = '#1b2159';
 
-				const lines = client.getLines(context, description, 743 - 59);
+				const lines = client.getLines(context, item.description, 743 - 59);
 				for (let i = 0; i < lines.length; i++) {
 					context.fillText(lines[i], 59, y + 90 + (i * 24));
 				}
@@ -128,17 +134,17 @@ module.exports = {
 				context.textAlign = "right";
 
 				context.strokeStyle = '#1b2159';
-				context.strokeText(`${cost}c`, 743, y + 56);
+				context.strokeText(item.cost, 743, y + 56);
 
 				context.fillStyle = "white";
-				context.fillText(`${cost}c`, 743, y + 56);
+				context.fillText(item.cost, 743, y + 56);
 			};
 
 			const drawPromises = [];
 			let yPos = 45;
 
 			for (const [name, item] of Object.entries(content[pageNumber])) {
-				drawPromises.push(drawItem(name, item.cost, item.description, yPos));
+				drawPromises.push(drawItem(name, item, yPos));
 
 				yPos += (176 + 12);
 			}
