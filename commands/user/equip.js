@@ -35,16 +35,39 @@ module.exports = {
 			await interaction.editReply(`${item} either does not exist, or you do not own it.`).catch(console.error); return;
 		}
 
+		if (
+			inventory.equipped_profile == item ||
+			inventory.equipped_role == item ||
+			inventory.equipped_icon == item
+		) {
+			await interaction.editReply(`${item} is already equipped.`).catch(console.error); return;
+		}
+
+		const member = interaction.member;
+
 		switch (category) {
 		case "profiles": inventory.equipped_profile = item; break;
 		case "roles":
 			// if has icon, equip icon
 			if (shopItems[category][item].icon) {
+				// unequip previous
+				if (inventory.equipped_icon != "none") {
+					member.roles.remove(shopItems[category][item].value);
+				}
+
 				inventory.equipped_icon = item;
 			}
 			else {
+				// unequip previous
+				if (inventory.equipped_role != "none") {
+					member.roles.remove(shopItems[category][item].value);
+				}
+
 				inventory.equipped_role = item;
 			}
+
+			// equip new
+			member.roles.add(shopItems[category][item].value);
 			break;
 		}
 
