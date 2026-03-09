@@ -92,6 +92,8 @@ module.exports = {
 			context.drawImage(background, 0, 0, canvas.width, canvas.height);
 
 			async function drawItem(name, item, y) {
+				context.shadowBlur = 0;
+
 				// background
 				context.drawImage(slot, 27, y);
 
@@ -138,6 +140,15 @@ module.exports = {
 
 				context.fillStyle = "white";
 				context.fillText(item.cost, 743, y + 56);
+
+				// icon
+				if (item.icon) {
+					context.shadowColor = "darkgray";
+					context.shadowBlur = 8;
+
+					const icon = await Canvas.loadImage(item.icon);
+					context.drawImage(icon, 680, y + 72, 72, 72);
+				}
 			};
 
 			const drawPromises = [];

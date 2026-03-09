@@ -80,9 +80,21 @@
       },
       "White Bow": {
          "cost": 250,
-         "description": "A white bow icon next to your name.",
+         "description": "A white bow icon next to your name. (The preview looks terrible but trust)",
          "value": "tes",
          "icon": "./img/icons/white_bow.png"
+      },
+      "White Star": {
+         "cost": 250,
+         "description": "A white star icon next to your name.",
+         "value": "tes",
+         "icon": "./img/icons/white_star.png"
+      },
+      "White Rose": {
+         "cost": 250,
+         "description": "A white rose icon next to your name.",
+         "value": "tes",
+         "icon": "./img/icons/white_rose.png"
       }
    },
    "tickets": {
