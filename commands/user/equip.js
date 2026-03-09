@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, InteractionContextType, MessageFlags } = require("discord.js");
+const shopItems = require('../../shop.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -36,7 +37,15 @@ module.exports = {
 
 		switch (category) {
 		case "profiles": inventory.equipped_profile = item; break;
-		case "roles": inventory.equipped_role = item; break;
+		case "roles":
+			// if has icon, equip icon
+			if (shopItems[category][item].icon) {
+				inventory.equipped_icon = item;
+			}
+			else {
+				inventory.equipped_role = item;
+			}
+			break;
 		}
 
 		await client.SaveInventory(id, inventory);

@@ -32,6 +32,7 @@ module.exports = {
 			inventory["black market"] = [];
 			inventory["equipped_profile"] = "Modern White";
 			inventory["equipped_role"] = "none";
+			inventory["equipped_icon"] = "none";
 
 			await db.set(`${id}_inventory`, inventory);
 

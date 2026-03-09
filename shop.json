@@ -25,14 +25,14 @@
       "Neon Lagoon": {
          "cost": 200,
          "description": "A green/blue gradient coloured role.",
-         "value": "test",
+         "value": "334539520219283467",
          "gradient_start": "00ff87",
          "gradient_end": "60efff"
       },
       "Sunset Candy": {
          "cost": 200,
          "description": "A red/orange gradient coloured role.",
-         "value": "test",
+         "value": "334539823790424064",
          "gradient_start": "ff0f7b",
          "gradient_end": "f89b29"
       },
@@ -81,13 +81,13 @@
       "White Bow": {
          "cost": 250,
          "description": "A white bow icon next to your name. (The preview looks terrible but trust)",
-         "value": "tes",
+         "value": "334540946613993482",
          "icon": "./img/icons/white_bow.png"
       },
       "White Star": {
          "cost": 250,
          "description": "A white star icon next to your name.",
-         "value": "tes",
+         "value": "1480409071654797394",
          "icon": "./img/icons/white_star.png"
       },
       "White Rose": {

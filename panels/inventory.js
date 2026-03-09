@@ -10,6 +10,7 @@ module.exports = {
 		for (const [category, items] of Object.entries(inventory)) {
 			if (category == "equipped_profile") { continue; }
 			if (category == "equipped_role") { continue; }
+			if (category == "equipped_icon") { continue; }
 			if (items.length == 0) { continue; }
 
 			// header
@@ -24,6 +25,7 @@ module.exports = {
 				let equipped = false;
 				if (inventory.equipped_profile == items[i]) { equipped = true; }
 				if (inventory.equipped_role == items[i]) { equipped = true; }
+				if (inventory.equipped_icon == items[i]) { equipped = true; }
 
 				itemsString += equipped ? `* **${items[i]} <--**\n` : `* ${items[i]}\n`;
 			}
