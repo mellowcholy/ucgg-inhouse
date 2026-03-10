@@ -99,6 +99,60 @@ const shopItems = {
 			"value": "1480889705162604644",
 			"icon": "./img/icons/white_rose.png",
 		},
+		"[ICON] Iron": {
+			"cost": 100,
+			"description": "An iron rank icon next to your name.",
+			"value": "",
+			"icon": "./img/icons/iron.png",
+		},
+		"[ICON] Bronze": {
+			"cost": 100,
+			"description": "A bronze rank icon next to your name.",
+			"value": "",
+			"icon": "./img/icons/bronze.png",
+		},
+		"[ICON] Silver": {
+			"cost": 100,
+			"description": "A silver rank icon next to your name.",
+			"value": "",
+			"icon": "./img/icons/silver.png",
+		},
+		"[ICON] Gold": {
+			"cost": 100,
+			"description": "A gold rank icon next to your name.",
+			"value": "",
+			"icon": "./img/icons/gold.png",
+		},
+		"[ICON] Platinum": {
+			"cost": 100,
+			"description": "A platinum rank icon next to your name.",
+			"value": "",
+			"icon": "./img/icons/platinum.png",
+		},
+		"[ICON] Diamond": {
+			"cost": 100,
+			"description": "A diamond rank icon next to your name.",
+			"value": "",
+			"icon": "./img/icons/diamond.png",
+		},
+		"[ICON] Master": {
+			"cost": 100,
+			"description": "A master rank icon next to your name.",
+			"value": "",
+			"icon": "./img/icons/master.png",
+		},
+		"[ICON] Grandmaster": {
+			"cost": 100,
+			"description": "A grandmaster rank icon next to your name.",
+			"value": "",
+			"icon": "./img/icons/grandmaster.png",
+		},
+		"[ICON] Challenger": {
+			"cost": 100,
+			"description": "A challenger rank icon next to your name.",
+			"value": "",
+			"icon": "./img/icons/challenger.png",
+		},
 	},
 	"tickets": {
 		"Coming Soon": {
