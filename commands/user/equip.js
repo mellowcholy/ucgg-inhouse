@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, InteractionContextType, MessageFlags } = require("discord.js");
-const shopItems = require('../../shop.json');
+const shopItems = require('../../shop.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()

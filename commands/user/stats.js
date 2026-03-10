@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, InteractionContextType } = require("discord.js");
 const { Collection } = require('discord.js');
-const shopItems = require('../../shop.json');
+const shopItems = require('../../shop.js');
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -23,8 +23,6 @@ function loadProfiles(dir) {
 	}
 }
 loadProfiles(profilePath);
-
-console.log(profiles);
 
 module.exports = {
 	data: new SlashCommandBuilder()

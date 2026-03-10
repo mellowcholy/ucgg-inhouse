@@ -1,5 +1,5 @@
 const { AttachmentBuilder, ContainerBuilder, ButtonStyle, ButtonBuilder, MediaGalleryBuilder, MessageFlags } = require("discord.js");
-const shopItems = require('../shop.json');
+const shopItems = require('../shop.js');
 const Canvas = require('@napi-rs/canvas');
 
 let background, slot;
