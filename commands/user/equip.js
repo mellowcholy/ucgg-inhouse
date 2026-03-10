@@ -52,7 +52,7 @@ module.exports = {
 			if (shopItems[category][item].icon) {
 				// unequip previous
 				if (inventory.equipped_icon != "none") {
-					member.roles.remove(shopItems[category][item].value);
+					await member.roles.remove(shopItems[category][inventory.equipped_icon].value);
 				}
 
 				inventory.equipped_icon = item;
@@ -60,14 +60,14 @@ module.exports = {
 			else {
 				// unequip previous
 				if (inventory.equipped_role != "none") {
-					member.roles.remove(shopItems[category][item].value);
+					await member.roles.remove(shopItems[category][inventory.equipped_role].value);
 				}
 
 				inventory.equipped_role = item;
 			}
 
 			// equip new
-			member.roles.add(shopItems[category][item].value);
+			await member.roles.add(shopItems[category][item].value);
 			break;
 		}
 

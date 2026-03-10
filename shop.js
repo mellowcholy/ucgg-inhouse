@@ -28,28 +28,28 @@ const shopItems = {
 		"Neon Lagoon": {
 			"cost": 500,
 			"description": "A green/blue gradient coloured role.",
-			"value": "334539520219283467",
+			"value": "1480889532214804540",
 			"gradient_start": "00ff87",
 			"gradient_end": "60efff",
 		},
 		"Sunset Candy": {
 			"cost": 500,
 			"description": "A red/orange gradient coloured role.",
-			"value": "334539823790424064",
+			"value": "1480889560803315892",
 			"gradient_start": "ff0f7b",
 			"gradient_end": "f89b29",
 		},
 		"Digital Sky": {
 			"cost": 500,
 			"description": "A blue gradient coloured role.",
-			"value": "test",
+			"value": "1480889593246257306",
 			"gradient_start": "0061ff",
 			"gradient_end": "60efff",
 		},
 		"Lavender Dream": {
 			"cost": 500,
 			"description": "A pink/purple gradient coloured role.",
-			"value": "test",
+			"value": "1480889620823543858",
 			"gradient_start": "696eff",
 			"gradient_end": "f8acff",
 		},
@@ -81,22 +81,22 @@ const shopItems = {
 			"gradient_start": "ebf4f5",
 			"gradient_end": "b5c6e0",
 		},
-		"White Bow": {
+		"[ICON] White Bow": {
 			"cost": 650,
 			"description": "A white bow icon next to your name. (The preview looks terrible but trust)",
-			"value": "334540946613993482",
+			"value": "1480889658257965138",
 			"icon": "./img/icons/white_bow.png",
 		},
-		"White Star": {
+		"[ICON] White Star": {
 			"cost": 650,
 			"description": "A white star icon next to your name.",
-			"value": "1480409071654797394",
+			"value": "1480889677215957116",
 			"icon": "./img/icons/white_star.png",
 		},
-		"White Rose": {
+		"[ICON] White Rose": {
 			"cost": 650,
 			"description": "A white rose icon next to your name.",
-			"value": "tes",
+			"value": "1480889705162604644",
 			"icon": "./img/icons/white_rose.png",
 		},
 	},
