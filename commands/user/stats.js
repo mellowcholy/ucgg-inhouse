@@ -8,14 +8,23 @@ const path = require("node:path");
 const profiles = new Collection();
 
 const profilePath = path.join(__dirname, '../../profiles');
-const files = fs.readdirSync(profilePath).filter((file) => file.endsWith('.js'));
 
-for (const file of files) {
-	const filePath = path.join(profilePath, file);
-	const profile = require(filePath);
-
-	profiles.set(file, profile);
+function loadProfiles(dir) {
+	const entries = fs.readdirSync(dir, { withFileTypes: true });
+	for (const entry of entries) {
+		const fullPath = path.join(dir, entry.name);
+		if (entry.isDirectory()) {
+			loadProfiles(fullPath);
+		}
+		else if (entry.isFile() && entry.name.endsWith('.js')) {
+			const profile = require(fullPath);
+			profiles.set(entry.name, profile);
+		}
+	}
 }
+loadProfiles(profilePath);
+
+console.log(profiles);
 
 module.exports = {
 	data: new SlashCommandBuilder()
