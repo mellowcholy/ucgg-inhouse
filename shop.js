@@ -153,6 +153,12 @@ const shopItems = {
 			"value": "",
 			"icon": "./img/icons/challenger.png",
 		},
+		"[ICON] Frame Mogging": {
+			"cost": 1000,
+			"description": "A Frame Mogging icon next to your name.",
+			"value": "",
+			"icon": "./img/icons/frame_mogging.png",
+		},
 	},
 	"tickets": {
 		"Coming Soon": {
