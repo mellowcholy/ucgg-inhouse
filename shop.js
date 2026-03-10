@@ -8,6 +8,11 @@ const shopItems = {
 			"description": "The default profile. You already have this.",
 			"value": "modern_white",
 		},
+		"Modern Black": {
+			"cost": 10,
+			"description": "The default profile... now in dark mode!",
+			"value": "modern_black",
+		},
 		"Y2K Black": {
 			"cost": 500,
 			"description": "Profile with Y2K aesthetics. Black, monochrome colour scheme.",
