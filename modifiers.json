@@ -51,7 +51,7 @@
       { "value": "Where's your sword? Don't need it. (Don't put points in one of your basic abilities)", "weight": 9.75},
       { "value": "Draw Your Draft! (Each player must draw the champion they want to ban, then draw the champion they want to pick)", "weight": 9.75},
       { "value": "Power of Friendship! (Everyone must be in the same VC!)", "weight": 9.75},
-      { "value": "Monochromatic! (Everyone must pick a colour, and base their build around it!) (Blue -> Arcane Comet, Ghost + Cleanse, Essence Reaver + Muramana (etc))", "weight": 9.75},
+      { "value": "Monochromatic! (Everyone must pick a colour, and base their build around it!) (Blue -> Arcane Comet, Ghost + Cleanse, Essence Reaver + Muramana (etc)) (IT'S NOT THAT DEEP)", "weight": 9.75},
       { "value": "The Spy! (One member of each team must be in the enemy team's VC!)", "weight": 9.75},
       { "value": "A Change of Scenery! (Draft Pick, but you play on an ARAM map!)", "weight": 9.75},
       { "value": "Nah, I'd win. (For both teams, each role must pick the same champion. Lower elo player decides the champion per role)", "weight": 9.75},
