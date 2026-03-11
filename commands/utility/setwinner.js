@@ -11,7 +11,7 @@ module.exports = {
 			.setRequired(true)
 			.addChoices(
 				{ name: 'Blue', value: "blue" },
-				{ name: 'Red', value: "false" },
+				{ name: 'Red', value: "red" },
 			),
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
