@@ -455,6 +455,9 @@ module.exports = {
 			const loser = result ? teams["redSide"] : teams["blueSide"];
 
 			// await client.keyv.set("matchNum", number);
+			let creditBoost = false;
+			const day = new Date().getDay();
+			if (day == 6) { creditBoost = true; }
 
 			// winner
 			for (const [role, player] of winner) {
@@ -462,7 +465,7 @@ module.exports = {
 				const data = await client.LoadPlayer(id);
 
 				data["wins"]++;
-				data["points"] += config.points_win;
+				data["points"] += creditBoost ? config.points_win * 3 : config.points_win;
 				data["mmrs"][role] += config.mmr_gain;
 
 				await client.SavePlayer(id, data);
@@ -474,7 +477,7 @@ module.exports = {
 				const data = await client.LoadPlayer(id);
 
 				data["losses"]++;
-				data["points"] += config.points_loss;
+				data["points"] += creditBoost ? config.points_loss * 3 : config.points_loss;
 				data["mmrs"][role] -= config.mmr_loss;
 
 				data["mmrs"][role] = Math.max(0, data["mmrs"][role]);

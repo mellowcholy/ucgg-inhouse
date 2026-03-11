@@ -58,11 +58,21 @@ module.exports = {
 			.addTextDisplayComponents((textDisplay) =>
 				textDisplay.setContent(`### Results for Match #${matchId}`),
 			)
-			.addSeparatorComponents((separator) => separator)
-			// blue side
-			.addTextDisplayComponents((textDisplay) =>
-				textDisplay.setContent(blueSideString),
+			.addSeparatorComponents((separator) => separator);
+
+		// supercharged saturday!
+		const day = new Date().getDay();
+		if (day == 6) {
+			container.addTextDisplayComponents((textDisplay) =>
+				textDisplay.setContent(`### SUPERCHARGED SATUDAY - 3x CREDIT GAINS`),
 			)
+				.addSeparatorComponents((separator) => separator);
+		}
+
+		// blue side
+		container.addTextDisplayComponents((textDisplay) =>
+			textDisplay.setContent(blueSideString),
+		)
 			.addSeparatorComponents((separator) => separator)
 			// red side
 			.addTextDisplayComponents((textDisplay) =>
