@@ -1,11 +1,12 @@
 const { Collection, MessageFlags, ChannelType } = require("discord.js");
 
-const modifiers = require('../modifiers.json');
-
 module.exports = {
 	run(client) {
 		const config = client.config;
 		client.matches = new Collection();
+
+		// BeginMatch() -> WheelVote() -> VOTE YES -> wheelVotePassed() -> wheelResult(true) -> MoveToVoice() -> winnerResult()
+		//                             -> VOTE NO             ->           wheelResult(false) -> MoveToVoice() -> winnerResult()
 
 		client.BeginMatch = async function(match) {
 			if (match.get("begin_lock")) { return; }
@@ -222,6 +223,24 @@ module.exports = {
 			});
 		};
 
+		client.refreshVoteModifier = function(match) {
+			const key = "modifierVote" + match.get("number");
+
+			client.enqueue(key, async () => {
+				const wheelVoteMessage = match.get("wheelVoteMsg"); // TODO
+
+				// check if msg is valid
+				const valid = await wheelVoteMessage.channel.messages.fetch(wheelVoteMessage.id); // TODO
+
+				if (!valid) { return; }
+
+				wheelVoteMessage.edit({ // TODO
+					components: [client.panels.get("Modifier Vote")(client, match)],
+					flags: MessageFlags.IsComponentsV2,
+				}).catch(console.error);
+			});
+		};
+
 		client.PickModifier = function(items) {
 			const totalWeight = items.reduce((sum, i) => sum + i.weight, 0);
 			let r = Math.random() * totalWeight;
@@ -232,18 +251,35 @@ module.exports = {
 			}
 		};
 
-		client.wheelResult = function(match, result) {
+		// wheel vote points to this now
+		client.wheelVotePassed = function(match) {
 			if (match.get("wheel_locked")) { return; }
 			match.set("wheel_locked", true);
 
 			const channel = match.get("textChannel");
-			const wheelVoteMessage = match.get("wheelVoteMsg");
+			const wheelVoteMessage = match.get("wheelVoteMsg"); // TODO: this should be modifiervote
 
 			wheelVoteMessage.delete();
 
+			channel.send({
+				components: [client.panels.get("Modifier Vote")(client, match)],
+				flags: MessageFlags.IsComponentsV2,
+			}).then(msg => match.set("modifierVoteMsg", msg));
+		};
+
+		// wheel vote used to point to this, but now its modifier vote
+		client.wheelResult = function(match, result, modifier = "none") {
+			if (match.get("modifier_locked")) { return; }
+			match.set("modifier_locked", true);
+
+			const channel = match.get("textChannel");
+			const modifierVoteMessage = match.get("modifierVoteMsg");
+
+			modifierVoteMessage.delete();
+
 			if (result) {
 
-				channel.send(`The random modifier for this game is: ${client.PickModifier(modifiers.modifiers)}`);
+				channel.send(`The random modifier for this game is: ${modifier}`);
 			}
 			else {
 				channel.send("The wheel will not be spun.");

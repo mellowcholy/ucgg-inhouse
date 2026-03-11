@@ -42,7 +42,7 @@ module.exports = {
 					});
 
 					if (wheelVotesYes.length >= config.wheel_vote_yes) {
-						client.wheelResult(match, true);
+						client.wheelVotePassed(match);
 					}
 					else {
 						client.refreshVoteWheel(match);
