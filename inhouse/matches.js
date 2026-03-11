@@ -1,4 +1,5 @@
 const { Collection, MessageFlags, ChannelType } = require("discord.js");
+const modifiers = require('../modifiers.json');
 
 module.exports = {
 	run(client) {
@@ -227,15 +228,19 @@ module.exports = {
 			const key = "modifierVote" + match.get("number");
 
 			client.enqueue(key, async () => {
-				const wheelVoteMessage = match.get("wheelVoteMsg"); // TODO
+				const modifierVoteMessage = match.get("modifierVoteMsg");
 
 				// check if msg is valid
-				const valid = await wheelVoteMessage.channel.messages.fetch(wheelVoteMessage.id); // TODO
+				const valid = await modifierVoteMessage.channel.messages.fetch(modifierVoteMessage.id);
 
 				if (!valid) { return; }
 
-				wheelVoteMessage.edit({ // TODO
-					components: [client.panels.get("Modifier Vote")(client, match)],
+				const modifier1 = match.get("modifier1");
+				const modifier2 = match.get("modifier2");
+				const modifier3 = match.get("modifier3");
+
+				modifierVoteMessage.edit({
+					components: [client.panels.get("Modifier Vote")(client, match, modifier1, modifier2, modifier3)],
 					flags: MessageFlags.IsComponentsV2,
 				}).catch(console.error);
 			});
@@ -257,12 +262,24 @@ module.exports = {
 			match.set("wheel_locked", true);
 
 			const channel = match.get("textChannel");
-			const wheelVoteMessage = match.get("wheelVoteMsg"); // TODO: this should be modifiervote
+			const wheelVoteMessage = match.get("wheelVoteMsg");
 
 			wheelVoteMessage.delete();
 
+			match.set("modifierVotes1", new Array());
+			match.set("modifierVotes2", new Array());
+			match.set("modifierVotes3", new Array());
+
+			const modifier1 = client.PickModifier(modifiers.modifiers);
+			const modifier2 = client.PickModifier(modifiers.modifiers);
+			const modifier3 = client.PickModifier(modifiers.modifiers);
+
+			match.set("modifier1", modifier1);
+			match.set("modifier2", modifier2);
+			match.set("modifier3", modifier3);
+
 			channel.send({
-				components: [client.panels.get("Modifier Vote")(client, match)],
+				components: [client.panels.get("Modifier Vote")(client, match, modifier1, modifier2, modifier3)],
 				flags: MessageFlags.IsComponentsV2,
 			}).then(msg => match.set("modifierVoteMsg", msg));
 		};
@@ -273,11 +290,11 @@ module.exports = {
 			match.set("modifier_locked", true);
 
 			const channel = match.get("textChannel");
-			const modifierVoteMessage = match.get("modifierVoteMsg");
-
-			modifierVoteMessage.delete();
 
 			if (result) {
+				const modifierVoteMessage = match.get("modifierVoteMsg");
+
+				modifierVoteMessage.delete();
 
 				channel.send(`The random modifier for this game is: ${modifier}`);
 			}
@@ -319,6 +336,9 @@ module.exports = {
 			match.delete("wheelVotesNo");
 			match.delete("wheelvote");
 			match.delete("wheelVoteMsg");
+			match.delete("modifierVotes1");
+			match.delete("modifierVotes2");
+			match.delete("modifierVotes3");
 
 			// vote for wheel spin.
 			match.set("winnerVotesBlue", new Array());

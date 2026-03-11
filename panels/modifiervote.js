@@ -1,9 +1,9 @@
-const { ContainerBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const modifiers = require('../modifiers.json');
+const { ContainerBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require("discord.js");
 
 module.exports = {
 	name: "Modifier Vote",
-	getContainer(client, match) {
+	getContainer(client, match, modifier1, modifier2, modifier3) {
+		const config = client.config;
 		const matchId = match.get("number");
 		let modVotes1 = match.get("modifierVotes1");
 		let modVotes2 = match.get("modifierVotes2");
@@ -75,7 +75,7 @@ module.exports = {
 					}
 
 					// they originally voted something else
-					const voted1 = modVotes2.indexOf(userId);
+					const voted1 = modVotes1.indexOf(userId);
 					if (voted1 != -1) { modVotes1.splice(voted1, 1); }
 					const voted3 = modVotes3.indexOf(userId);
 					if (voted3 != -1) { modVotes3.splice(voted3, 1); }
@@ -126,7 +126,7 @@ module.exports = {
 					const voted1 = modVotes1.indexOf(userId);
 					if (voted1 != -1) { modVotes1.splice(voted1, 1); }
 
-					modVotes1.push(userId);
+					modVotes3.push(userId);
 
 					await interaction.reply({
 						content: 'You voted for modifier 3.',
@@ -149,10 +149,6 @@ module.exports = {
 			}
 		}
 		setupButtons();
-
-		const modifier1 = client.PickModifier(modifiers.modifiers);
-		const modifier2 = client.PickModifier(modifiers.modifiers);
-		const modifier3 = client.PickModifier(modifiers.modifiers);
 
 		const container = new ContainerBuilder().setAccentColor(0xac9cff)
 			.addTextDisplayComponents((textDisplay) => textDisplay.setContent(`## Vote for a modifier`))
