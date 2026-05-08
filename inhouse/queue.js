@@ -4,11 +4,11 @@ module.exports = {
 	run(client) {
 		// setup queue
 		client.queue = new Collection([
-			["Top", new Array("1", "2")],
-			["Jungle", new Array("1", "2")],
-			["Mid", new Array("1", "2")],
-			["Bot", new Array("1", "2")],
-			["Support", new Array("1")],
+			["Top", new Array()],
+			["Jungle", new Array()],
+			["Mid", new Array()],
+			["Bot", new Array()],
+			["Support", new Array()],
 			["Fill", new Array()],
 		]);
 
@@ -25,6 +25,8 @@ module.exports = {
 				if (client.latestInhousePost != null) {
 					await client.latestInhousePost.delete().catch(console.error);
 				}
+
+				client.resetInactivityTimer();
 
 				await channel.send({
 					components: [client.panels.get("In-House Queue")(client)],
@@ -84,10 +86,57 @@ module.exports = {
 			}
 
 			queuePos.push(userId);
+			client.resetInactivityTimer();
 
 			CheckQueuePop();
 
 			return 1;
+		};
+
+		client.inactivityTimer = null;
+
+		client.resetInactivityTimer = async function() {
+			clearTimeout(client.inactivityTimer);
+
+			const queue = client.queue;
+
+			client.inactivityTimer = setTimeout(async () => {
+				let empty = true;
+
+				for (const key of queue.keys()) {
+					const queuePos = queue.get(key);
+					const num = key == "Fill" ? queuePos.length : Math.min(2, queuePos.length);
+
+					for (let i = 0; i < num; i++) {
+						const player = queuePos.shift();
+						empty = false;
+
+						await client.InactivityLeave(player);
+					}
+				}
+
+				if (empty) { return; }
+
+				console.log("CLEARING QUEUE FOR INACTIVITY");
+				client.RefreshInHousePost();
+			}, 18000 * 1000);
+		};
+
+		client.InactivityLeave = async function(userId) {
+			let target = client.users.cache.get(userId);
+
+			if (!target) {
+				try {
+					target = await client.users.fetch(userId);
+				}
+				catch (error) {
+					console.error('User not found:', error);
+					return;
+				}
+			}
+
+			target.send(`-# Automated Message:\nYou have been removed from the queue as there has been no queue activity for five hours.`).catch(console.error);
+			client.LeaveQueue(userId);
 		};
 
 		client.LeaveQueue = function(userId) {
