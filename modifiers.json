@@ -58,13 +58,13 @@
       { "value": "Take notes. (You must pick the enemy team player's highest mastery champion for your role)", "weight": 9.75},
       { "value": "It's High Noon. (The team to take Baron Nashor first, wins the game)", "weight": 9.75},
 
-      { "value": "[INSANITY!] Mortal Reminder. (If you die, leave the game)", "weight": 12.025},
-      { "value": "[INSANITY!] The Price of Living. (If you die, you must sell an item in your inventory) (Cannot be wards/potions)", "weight": 12.025},
-      { "value": "[INSANITY!] Musical Lanes! (Every 5 minutes, you must rotate lanes (Until two towers are destroyed)) (Blue side goes downwards, Red side goes upwards)", "weight": 12.025},
-      { "value": "[INSANITY!] Ultimate Addict! (You must use your ultimate off cooldown, no matter what)", "weight": 12.025},
-      { "value": "[INSANITY!] Solidarity! (If someone on your team flashes, everyone else must flash ASAP)", "weight": 12.025},
-      { "value": "[INSANITY!] ADC Protection Program! (If your ADC dies, everyone else on the team must die)", "weight": 12.025},
-      { "value": "[INSANITY!] Signature Weapon! (You can only use one item slot!)", "weight": 12.025},
-      { "value": "[INSANITY!] Mid Monopoly! (Only one person from each team can be in mid lane at any time!)", "weight": 12.025}
+      { "value": "[INSANITY!] Mortal Reminder. (If you die, leave the game)", "weight": 0.125},
+      { "value": "[INSANITY!] The Price of Living. (If you die, you must sell an item in your inventory) (Cannot be wards/potions)", "weight": 0.125},
+      { "value": "[INSANITY!] Musical Lanes! (Every 5 minutes, you must rotate lanes (Until two towers are destroyed)) (Blue side goes downwards, Red side goes upwards)", "weight": 0.125},
+      { "value": "[INSANITY!] Ultimate Addict! (You must use your ultimate off cooldown, no matter what)", "weight": 0.125},
+      { "value": "[INSANITY!] Solidarity! (If someone on your team flashes, everyone else must flash ASAP)", "weight": 0.125},
+      { "value": "[INSANITY!] ADC Protection Program! (If your ADC dies, everyone else on the team must die)", "weight": 0.125},
+      { "value": "[INSANITY!] Signature Weapon! (You can only use one item slot!)", "weight": 0.125},
+      { "value": "[INSANITY!] Mid Monopoly! (Only one person from each team can be in mid lane at any time!)", "weight": 0.125}
    ]
 }

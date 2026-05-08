@@ -262,9 +262,6 @@ module.exports = {
 			match.set("wheel_locked", true);
 
 			const channel = match.get("textChannel");
-			const wheelVoteMessage = match.get("wheelVoteMsg");
-
-			wheelVoteMessage.delete();
 
 			match.set("modifierVotes1", new Array());
 			match.set("modifierVotes2", new Array());
@@ -288,6 +285,9 @@ module.exports = {
 		client.wheelResult = function(match, result, modifier = "none") {
 			if (match.get("modifier_locked")) { return; }
 			match.set("modifier_locked", true);
+
+			const wheelVoteMessage = match.get("wheelVoteMsg");
+			wheelVoteMessage.delete();
 
 			const channel = match.get("textChannel");
 
