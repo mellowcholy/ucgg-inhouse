@@ -23,11 +23,15 @@ module.exports = {
 					await client.latestInhousePost.delete().catch(console.error);
 				}
 
+				client.inhousePosting = true;
 				await channel.send({
 					components: [client.panels.get("In-House Queue")(client)],
 					flags: MessageFlags.IsComponentsV2,
 					allowedMentions: { parse: [] },
-				}).then(msg => client.latestInhousePost = msg);
+				}).then(msg => {
+					client.latestInhousePost = msg;
+					client.inhousePosting = false;
+				});
 			});
 		};
 

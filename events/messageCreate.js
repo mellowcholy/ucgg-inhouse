@@ -7,7 +7,7 @@ module.exports = {
 		const config = client.config;
 
 		if (message.channelId != config.inhouse_channel) { return; } // not inhouse channel
-		if (message.member.id == config.clientId) { return; } // caitlyn sent the msg
+		if (client.inhousePosting) { return; } // it IS the queue
 
 		// refresh post
 		client.RefreshInHousePost();
