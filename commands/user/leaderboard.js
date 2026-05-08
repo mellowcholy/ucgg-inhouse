@@ -16,6 +16,7 @@ module.exports = {
 				{ name: "Bot MMR", value: "Bot" },
 				{ name: "Support MMR", value: "Support" },
 				{ name: "Average MMR", value: "average" },
+				{ name: "Winrate", value: "winrate" },
 			))
 		.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
@@ -37,6 +38,7 @@ module.exports = {
 		let label = "";
 		let mmr = false;
 		let average = false;
+		let winrate = false;
 
 		switch (stat) {
 		case "wins":
@@ -59,10 +61,28 @@ module.exports = {
 			label = stat;
 			mmr = true;
 			break;
+		case "winrate":
+			label = "Winrate";
+			winrate = true;
+			break;
 		}
 
+
 		let sorted;
-		if (average) {
+		if (winrate) {
+			sorted = [];
+
+			for (let i = 0; i < leaderboard.length; i++) {
+				const wins = leaderboard[i][1]["wins"];
+				const losses = leaderboard[i][1]["losses"];
+				const winrateStat = (Math.round((wins / (wins + losses)) * 100) || 0);
+
+				sorted.push([leaderboard[i][0], winrateStat]);
+			}
+
+			sorted = sorted.sort((a, b) => b[1] - a[1]);
+		}
+		else if (average) {
 			sorted = [];
 
 			for (let i = 0; i < leaderboard.length; i++) {
@@ -104,7 +124,7 @@ module.exports = {
 
 		const maxPages = pages.length;
 
-		const statList = { label: label, maxPages: maxPages, pages: pages, mmr: mmr, key: key, average: average };
+		const statList = { label: label, maxPages: maxPages, pages: pages, mmr: mmr, key: key, average: average, winrate: winrate };
 
 		const panel = await client.panels.get("Leaderboard")(client, statList, pageNum, interaction);
 		const board = await interaction.editReply({ components: [panel[1], panel[0]], flags: MessageFlags.IsComponentsV2, files: [panel[2]] }).catch(console.error);

@@ -1,4 +1,4 @@
-const { MessageFlags, Collection, ChannelType, time, TimestampStyles, Colors } = require('discord.js');
+const { MessageFlags, Collection, ChannelType, time, TimestampStyles, Colors, AttachmentBuilder } = require('discord.js');
 
 module.exports = {
 	run(client) {
@@ -14,8 +14,11 @@ module.exports = {
 
 		const config = client.config;
 
+		const file = new AttachmentBuilder("./img/queue_banner.png");
+
 		// create inhouse post func
 		client.RefreshInHousePost = function() {
+			client.inhousePosting = true;
 			client.enqueue(config.inhouse_channel, async () => {
 				const channel = client.channels.cache.get(config.inhouse_channel);
 
@@ -23,11 +26,17 @@ module.exports = {
 					await client.latestInhousePost.delete().catch(console.error);
 				}
 
+				client.resetInactivityTimer();
+
 				await channel.send({
 					components: [client.panels.get("In-House Queue")(client)],
+					files: [file],
 					flags: MessageFlags.IsComponentsV2,
 					allowedMentions: { parse: [] },
-				}).then(msg => client.latestInhousePost = msg);
+				}).then(msg => {
+					client.latestInhousePost = msg;
+					client.inhousePosting = false;
+				});
 			});
 		};
 
@@ -77,10 +86,57 @@ module.exports = {
 			}
 
 			queuePos.push(userId);
+			client.resetInactivityTimer();
 
 			CheckQueuePop();
 
 			return 1;
+		};
+
+		client.inactivityTimer = null;
+
+		client.resetInactivityTimer = async function() {
+			clearTimeout(client.inactivityTimer);
+
+			const queue = client.queue;
+
+			client.inactivityTimer = setTimeout(async () => {
+				let empty = true;
+
+				for (const key of queue.keys()) {
+					const queuePos = queue.get(key);
+					const num = key == "Fill" ? queuePos.length : Math.min(2, queuePos.length);
+
+					for (let i = 0; i < num; i++) {
+						const player = queuePos.shift();
+						empty = false;
+
+						await client.InactivityLeave(player);
+					}
+				}
+
+				if (empty) { return; }
+
+				console.log("CLEARING QUEUE FOR INACTIVITY");
+				client.RefreshInHousePost();
+			}, 18000 * 1000);
+		};
+
+		client.InactivityLeave = async function(userId) {
+			let target = client.users.cache.get(userId);
+
+			if (!target) {
+				try {
+					target = await client.users.fetch(userId);
+				}
+				catch (error) {
+					console.error('User not found:', error);
+					return;
+				}
+			}
+
+			target.send(`-# Automated Message:\nYou have been removed from the queue as there has been no queue activity for five hours.`).catch(console.error);
+			client.LeaveQueue(userId);
 		};
 
 		client.LeaveQueue = function(userId) {
@@ -188,6 +244,7 @@ module.exports = {
 			});
 
 			match.set("textChannel", textChannel);
+			match.set("votePosting", true);
 			match.set("waitingRoom", waitingRoom);
 
 			// make a new pingable role for all the players in this queue

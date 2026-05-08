@@ -5,6 +5,7 @@ module.exports = {
 	run(client) {
 		const config = client.config;
 		client.matches = new Collection();
+		client.matchChannels = new Collection(); // for keeping vote at the bottom of the channel
 
 		// BeginMatch() -> WheelVote() -> VOTE YES -> wheelVotePassed() -> wheelResult(true) -> MoveToVoice() -> winnerResult()
 		//                             -> VOTE NO             ->           wheelResult(false) -> MoveToVoice() -> winnerResult()
@@ -17,6 +18,8 @@ module.exports = {
 
 			match.set("teams", teams);
 
+			client.matchChannels.set(match.get("textChannel").id, match);
+
 			WheelVote(match);
 		};
 
@@ -27,6 +30,7 @@ module.exports = {
 
 			// delete text channel
 			const textChannel = match.get("textChannel");
+			client.matchChannels.delete(textChannel.id);
 			if (textChannel != null) {
 				textChannel.delete();
 			}
@@ -246,13 +250,13 @@ module.exports = {
 			});
 		};
 
-		client.PickModifier = function(items) {
-			const totalWeight = items.reduce((sum, i) => sum + i.weight, 0);
+		client.PickModifier = function(items, exclude = []) {
+			const available = items.filter(i => !exclude.includes(i.value));
+			const totalWeight = available.reduce((sum, i) => sum + i.weight, 0);
 			let r = Math.random() * totalWeight;
-
-			for (const item of items) {
+			for (const item of available) {
 				r -= item.weight;
-				if (r < 0) return item.value;
+				if (r < 0) return item;
 			}
 		};
 
@@ -262,17 +266,14 @@ module.exports = {
 			match.set("wheel_locked", true);
 
 			const channel = match.get("textChannel");
-			const wheelVoteMessage = match.get("wheelVoteMsg");
-
-			wheelVoteMessage.delete();
 
 			match.set("modifierVotes1", new Array());
 			match.set("modifierVotes2", new Array());
 			match.set("modifierVotes3", new Array());
 
 			const modifier1 = client.PickModifier(modifiers.modifiers);
-			const modifier2 = client.PickModifier(modifiers.modifiers);
-			const modifier3 = client.PickModifier(modifiers.modifiers);
+			const modifier2 = client.PickModifier(modifiers.modifiers, [modifier1]);
+			const modifier3 = client.PickModifier(modifiers.modifiers, [modifier1, modifier2]);
 
 			match.set("modifier1", modifier1);
 			match.set("modifier2", modifier2);
@@ -289,6 +290,9 @@ module.exports = {
 			if (match.get("modifier_locked")) { return; }
 			match.set("modifier_locked", true);
 
+			const wheelVoteMessage = match.get("wheelVoteMsg");
+			wheelVoteMessage.delete();
+
 			const channel = match.get("textChannel");
 
 			if (result) {
@@ -296,7 +300,13 @@ module.exports = {
 
 				modifierVoteMessage.delete();
 
-				channel.send(`The random modifier for this game is: ${modifier}`);
+				let string = `The random modifier for this game is: ${modifier.value}`;
+
+				if (modifier.description) {
+					string += `\n${modifier.description}`;
+				}
+
+				channel.send(string);
 			}
 			else {
 				channel.send("The wheel will not be spun.");
@@ -350,7 +360,10 @@ module.exports = {
 				components: [client.panels.get("Teams and Vote Winner")(client, match)],
 				flags: MessageFlags.IsComponentsV2,
 				allowedMentions: { parse: [] },
-			}).then(msg => match.set("winnerVoteMsg", msg));
+			}).then(msg => {
+				match.set("winnerVoteMsg", msg);
+				match.set("votePosting", false);
+			});
 
 			// create team a and team b vc
 			const category = client.channels.cache.get(config.inhouse_category);
@@ -426,6 +439,7 @@ module.exports = {
 			// delete vc and text and other data
 			match.delete("positions");
 			const textChannel = match.get("textChannel");
+			client.matchChannels.delete(textChannel.id);
 			textChannel.delete();
 
 			match.delete("textChannel");
@@ -457,7 +471,7 @@ module.exports = {
 			// await client.keyv.set("matchNum", number);
 			let creditBoost = false;
 			const day = new Date().getDay();
-			if (day == 6) { creditBoost = true; }
+			if (day == 6 || day == 0) { creditBoost = true; }
 
 			// winner
 			for (const [role, player] of winner) {
@@ -490,7 +504,9 @@ module.exports = {
 
 		client.refreshWinnerVote = function(match) {
 			const key = "winnerVote" + match.get("number");
+			const channel = match.get("textChannel");
 
+			match.set("votePosting", true);
 			client.enqueue(key, async () => {
 				const winnerVoteMessage = match.get("winnerVoteMsg");
 
@@ -499,11 +515,16 @@ module.exports = {
 
 				if (!valid) { return; }
 
-				winnerVoteMessage.edit({
+				await winnerVoteMessage.delete();
+
+				channel.send({
 					components: [client.panels.get("Teams and Vote Winner")(client, match)],
 					flags: MessageFlags.IsComponentsV2,
 					allowedMentions: { parse: [] },
-				}).catch(console.error);
+				}).then(msg => {
+					match.set("winnerVoteMsg", msg);
+					match.set("votePosting", false);
+				});
 			});
 		};
 	},

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, InteractionContextType, MessageFlags } = require("discord.js");
+const { SlashCommandBuilder, InteractionContextType, MessageFlags, AttachmentBuilder } = require("discord.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -14,8 +14,9 @@ module.exports = {
 
 		const inventory = await client.LoadInventory(target.id);
 
+		const file = new AttachmentBuilder("./img/inventory_banner.png");
 		const panel = client.panels.get("Inventory")(client, target.displayName, inventory);
 
-		await interaction.editReply({ components: [panel], flags: MessageFlags.IsComponentsV2 }).catch(console.error); return;
+		await interaction.editReply({ components: [panel], files: [file], flags: MessageFlags.IsComponentsV2 }).catch(console.error); return;
 	},
 };

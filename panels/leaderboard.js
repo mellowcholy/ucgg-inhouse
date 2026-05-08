@@ -139,6 +139,9 @@ module.exports = {
 				if (stats.average) {
 					value = entry[1][1];
 				}
+				else if (stats.winrate) {
+					value = entry[1][1] + "%";
+				}
 				else {
 					value = stats.mmr ? entry[1][1]["mmrs"][stats.key] : entry[1][1][stats.key];
 				}

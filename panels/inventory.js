@@ -3,8 +3,13 @@ const { ContainerBuilder } = require("discord.js");
 module.exports = {
 	name: "Inventory",
 	getContainer(client, name, inventory) {
-		const container = new ContainerBuilder().setAccentColor(0xac9cff)
-			.addTextDisplayComponents((textDisplay) => textDisplay.setContent(`## ${name}'s Inventory`));
+		const container = new ContainerBuilder().setAccentColor(0x64f2c8)
+			.addMediaGalleryComponents((mediaGallery) =>
+				mediaGallery.addItems((item) =>
+					item.setURL("attachment://inventory_banner.png").setDescription('Inventory Banner'),
+				),
+			)
+			.addTextDisplayComponents((textDisplay) => textDisplay.setContent(`-# ${name}`));
 
 		// populate inventory
 		for (const [category, items] of Object.entries(inventory)) {

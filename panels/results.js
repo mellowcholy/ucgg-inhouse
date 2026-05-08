@@ -62,9 +62,9 @@ module.exports = {
 
 		// supercharged saturday!
 		const day = new Date().getDay();
-		if (day == 6) {
+		if (day == 6 || day == 0) {
 			container.addTextDisplayComponents((textDisplay) =>
-				textDisplay.setContent(`### SUPERCHARGED SATUDAY - 3x CREDIT GAINS`),
+				textDisplay.setContent(`### SUPERCHARGED WEEKEND - 3x CREDIT GAINS`),
 			)
 				.addSeparatorComponents((separator) => separator);
 		}
