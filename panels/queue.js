@@ -107,8 +107,13 @@ module.exports = {
 		// panels
 		const container = new ContainerBuilder()
 			.setAccentColor(0xac9cff)
+			.addMediaGalleryComponents((mediaGallery) =>
+				mediaGallery.addItems((item) =>
+					item.setURL("attachment://queue_banner.png").setDescription('Queue Banner'),
+				),
+			)
 			.addTextDisplayComponents((textDisplay) =>
-				textDisplay.setContent(`## In-House Queue\n-# ${playerCount} players in queue`),
+				textDisplay.setContent(`-# ${playerCount} players in queue`),
 			)
 			.addSeparatorComponents((separator) => separator)
 			// top lane

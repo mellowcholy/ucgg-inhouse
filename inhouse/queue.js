@@ -1,4 +1,4 @@
-const { MessageFlags, Collection, ChannelType, time, TimestampStyles, Colors } = require('discord.js');
+const { MessageFlags, Collection, ChannelType, time, TimestampStyles, Colors, AttachmentBuilder } = require('discord.js');
 
 module.exports = {
 	run(client) {
@@ -14,6 +14,8 @@ module.exports = {
 
 		const config = client.config;
 
+		const file = new AttachmentBuilder("./img/queue_banner.png");
+
 		// create inhouse post func
 		client.RefreshInHousePost = function() {
 			client.inhousePosting = true;
@@ -26,6 +28,7 @@ module.exports = {
 
 				await channel.send({
 					components: [client.panels.get("In-House Queue")(client)],
+					files: [file],
 					flags: MessageFlags.IsComponentsV2,
 					allowedMentions: { parse: [] },
 				}).then(msg => {
