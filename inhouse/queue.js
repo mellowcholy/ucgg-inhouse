@@ -4,11 +4,11 @@ module.exports = {
 	run(client) {
 		// setup queue
 		client.queue = new Collection([
-			["Top", new Array()],
-			["Jungle", new Array()],
-			["Mid", new Array()],
-			["Bot", new Array()],
-			["Support", new Array()],
+			["Top", new Array("1", "2")],
+			["Jungle", new Array("1", "2")],
+			["Mid", new Array("1", "2")],
+			["Bot", new Array("1", "2")],
+			["Support", new Array("1")],
 			["Fill", new Array()],
 		]);
 
@@ -16,6 +16,7 @@ module.exports = {
 
 		// create inhouse post func
 		client.RefreshInHousePost = function() {
+			client.inhousePosting = true;
 			client.enqueue(config.inhouse_channel, async () => {
 				const channel = client.channels.cache.get(config.inhouse_channel);
 
@@ -23,7 +24,6 @@ module.exports = {
 					await client.latestInhousePost.delete().catch(console.error);
 				}
 
-				client.inhousePosting = true;
 				await channel.send({
 					components: [client.panels.get("In-House Queue")(client)],
 					flags: MessageFlags.IsComponentsV2,
@@ -192,6 +192,7 @@ module.exports = {
 			});
 
 			match.set("textChannel", textChannel);
+			match.set("votePosting", true);
 			match.set("waitingRoom", waitingRoom);
 
 			// make a new pingable role for all the players in this queue

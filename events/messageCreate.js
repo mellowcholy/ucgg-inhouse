@@ -6,10 +6,20 @@ module.exports = {
 		const client = message.client;
 		const config = client.config;
 
-		if (message.channelId != config.inhouse_channel) { return; } // not inhouse channel
-		if (client.inhousePosting) { return; } // it IS the queue
+		// keep queue at bottom
+		if (message.channelId == config.inhouse_channel) {
+			if (client.inhousePosting) { return; } // it IS the queue
 
-		// refresh post
-		client.RefreshInHousePost();
+			client.RefreshInHousePost();
+		}
+
+		// keep vote at bottom
+		const match = client.matchChannels.get(message.channelId);
+		if (match != undefined) {
+			console.log(match.get("votePosting"));
+			if (match.get("votePosting")) { return; } // it IS the vote
+
+			client.refreshWinnerVote(match);
+		}
 	},
 };

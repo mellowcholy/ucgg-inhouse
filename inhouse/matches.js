@@ -5,6 +5,7 @@ module.exports = {
 	run(client) {
 		const config = client.config;
 		client.matches = new Collection();
+		client.matchChannels = new Collection(); // for keeping vote at the bottom of the channel
 
 		// BeginMatch() -> WheelVote() -> VOTE YES -> wheelVotePassed() -> wheelResult(true) -> MoveToVoice() -> winnerResult()
 		//                             -> VOTE NO             ->           wheelResult(false) -> MoveToVoice() -> winnerResult()
@@ -17,6 +18,8 @@ module.exports = {
 
 			match.set("teams", teams);
 
+			client.matchChannels.set(match.get("textChannel").id, match);
+
 			WheelVote(match);
 		};
 
@@ -27,6 +30,7 @@ module.exports = {
 
 			// delete text channel
 			const textChannel = match.get("textChannel");
+			client.matchChannels.delete(textChannel.id);
 			if (textChannel != null) {
 				textChannel.delete();
 			}
@@ -350,7 +354,10 @@ module.exports = {
 				components: [client.panels.get("Teams and Vote Winner")(client, match)],
 				flags: MessageFlags.IsComponentsV2,
 				allowedMentions: { parse: [] },
-			}).then(msg => match.set("winnerVoteMsg", msg));
+			}).then(msg => {
+				match.set("winnerVoteMsg", msg);
+				match.set("votePosting", false);
+			});
 
 			// create team a and team b vc
 			const category = client.channels.cache.get(config.inhouse_category);
@@ -426,6 +433,7 @@ module.exports = {
 			// delete vc and text and other data
 			match.delete("positions");
 			const textChannel = match.get("textChannel");
+			client.matchChannels.delete(textChannel.id);
 			textChannel.delete();
 
 			match.delete("textChannel");
@@ -490,7 +498,9 @@ module.exports = {
 
 		client.refreshWinnerVote = function(match) {
 			const key = "winnerVote" + match.get("number");
+			const channel = match.get("textChannel");
 
+			match.set("votePosting", true);
 			client.enqueue(key, async () => {
 				const winnerVoteMessage = match.get("winnerVoteMsg");
 
@@ -499,11 +509,16 @@ module.exports = {
 
 				if (!valid) { return; }
 
-				winnerVoteMessage.edit({
+				await winnerVoteMessage.delete();
+
+				channel.send({
 					components: [client.panels.get("Teams and Vote Winner")(client, match)],
 					flags: MessageFlags.IsComponentsV2,
 					allowedMentions: { parse: [] },
-				}).catch(console.error);
+				}).then(msg => {
+					match.set("winnerVoteMsg", msg);
+					match.set("votePosting", false);
+				});
 			});
 		};
 	},
