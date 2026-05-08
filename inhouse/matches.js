@@ -457,7 +457,7 @@ module.exports = {
 			// await client.keyv.set("matchNum", number);
 			let creditBoost = false;
 			const day = new Date().getDay();
-			if (day == 6) { creditBoost = true; }
+			if (day == 6 || day == 0) { creditBoost = true; }
 
 			// winner
 			for (const [role, player] of winner) {
