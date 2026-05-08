@@ -256,7 +256,7 @@ module.exports = {
 			let r = Math.random() * totalWeight;
 			for (const item of available) {
 				r -= item.weight;
-				if (r < 0) return item.value;
+				if (r < 0) return item;
 			}
 		};
 
@@ -300,7 +300,13 @@ module.exports = {
 
 				modifierVoteMessage.delete();
 
-				channel.send(`The random modifier for this game is: ${modifier}`);
+				let string = `The random modifier for this game is: ${modifier.value}`;
+
+				if (modifier.description) {
+					string += `\n${modifier.description}`;
+				}
+
+				channel.send(string);
 			}
 			else {
 				channel.send("The wheel will not be spun.");
