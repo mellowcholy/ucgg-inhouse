@@ -1,6 +1,13 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
+const Use = {
+	WHENEVER: 0, // u can use this ticket whenever
+	PREWHEELVOTE: 1, // u can only use this ticket before the wheel vote
+	POSTWHEELVOTE: 2, // u can only use this ticket after the wheel vote
+	GAME: 3, // u can only use this ticket during a game (prewheelvote + postwheelvote)
+};
+
 const shopItems = {
 	"profiles": {
 		"Modern White": {
@@ -166,17 +173,53 @@ const shopItems = {
 		},
 	},
 	"tickets": {
-		"Coming Soon": {
-			"cost": 99999999999,
-			"description": "Please don't try and buy this...",
-			"value": "test",
+		"4x Credits Ticket": {
+			"cost": 30,
+			"description": "Using this ticket will make everyone in the match gain 4x credits! [NOT STACKABLE]",
+			"value": "4xcredits",
+			"use": Use.GAME,
+		},
+		"One-Trick Ticket": {
+			"cost": 30,
+			"description": "Using this ticket will ensure you get your champion! [NOT VALID FOR WHEEL GAMES]",
+			"value": Use.GAME,
+		},
+		"Extra Ban Ticket": {
+			"cost": 30,
+			"description": "Using this ticket will allow you to ban one extra champion! [NOT VALID FOR WHEEL GAMES]",
+			"value": Use.GAME,
 		},
 	},
 	"black market": {
-		"Coming Soon": {
-			"cost": 99999999999,
-			"description": "Please don't try and buy this...",
-			"value": "test",
+		"mvp_h4ck.exe": {
+			"cost": 50,
+			"description": "Gain one MVP.",
+			"value": Use.WHENEVER,
+		},
+		"Mandatory Meeting": {
+			"cost": 1000,
+			"description": "You get a 10 minute voice call with mellowcholy. Voice WILL be used.",
+			"value": Use.WHENEVER,
+		},
+		"uN5T4BL3_TR4N5F3R.bat": {
+			"cost": 100,
+			"description": "50/50 chance between stealing 50 credits from someone, or them stealing it from you.",
+			"value": Use.WHENEVER,
+		},
+		"ALERT.sys": {
+			"cost": 50,
+			"description": "Ping someone at a random time.",
+			"value": Use.WHENEVER,
+		},
+		"DEAD_MANS_SWITCH.dll": {
+			"cost": 35,
+			"description": "If you lose the current game, no one gains any credits.",
+			"value": Use.PREWHEELVOTE,
+		},
+		"FIREWALL.sh": {
+			"cost": 50,
+			"description": "Block the next black market attack on you. [NOT STACKABLE]",
+			"value": Use.PREWHEELVOTE,
 		},
 	},
 };
