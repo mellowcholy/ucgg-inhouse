@@ -250,11 +250,11 @@ module.exports = {
 			});
 		};
 
-		client.PickModifier = function(items) {
-			const totalWeight = items.reduce((sum, i) => sum + i.weight, 0);
+		client.PickModifier = function(items, exclude = []) {
+			const available = items.filter(i => !exclude.includes(i.value));
+			const totalWeight = available.reduce((sum, i) => sum + i.weight, 0);
 			let r = Math.random() * totalWeight;
-
-			for (const item of items) {
+			for (const item of available) {
 				r -= item.weight;
 				if (r < 0) return item.value;
 			}
@@ -272,8 +272,8 @@ module.exports = {
 			match.set("modifierVotes3", new Array());
 
 			const modifier1 = client.PickModifier(modifiers.modifiers);
-			const modifier2 = client.PickModifier(modifiers.modifiers);
-			const modifier3 = client.PickModifier(modifiers.modifiers);
+			const modifier2 = client.PickModifier(modifiers.modifiers, [modifier1]);
+			const modifier3 = client.PickModifier(modifiers.modifiers, [modifier1, modifier2]);
 
 			match.set("modifier1", modifier1);
 			match.set("modifier2", modifier2);
