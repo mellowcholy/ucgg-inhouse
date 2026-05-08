@@ -27,6 +27,8 @@ module.exports = {
 			await interaction.client.channels.cache.get(results_channel).send({
 				content: `${interaction.user.username} has cancelled Match #${number}`,
 			}).catch(console.error);
+
+			interaction.deleteReply();
 			return;
 		}
 	},
