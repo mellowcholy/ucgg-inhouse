@@ -22,7 +22,7 @@ module.exports = {
 
 				const state = client.leaderboards.get(int.message.id);
 				const stats = client.leaderboardsStats.get(int.message.id);
-				if (!state || !stats) { throw e; }
+				if (!state || !stats) { await int.deleteReply(); return; }
 
 				state.num--;
 				state.num = Math.max(0, state.num);
@@ -40,7 +40,7 @@ module.exports = {
 
 				const state = client.leaderboards.get(int.message.id);
 				const stats = client.leaderboardsStats.get(int.message.id);
-				if (!state || !stats) { throw e; }
+				if (!state || !stats) { await int.deleteReply(); return; }
 
 				state.num++;
 				state.num = Math.min(stats.maxPages - 1, state.num);
