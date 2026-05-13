@@ -8,7 +8,7 @@ module.exports = {
 
 		// keep queue at bottom
 		if (message.channelId == config.inhouse_channel) {
-			if (client.inhousePosting) { return; } // it IS the queue
+			if (message.member.id == config.clientId) { return; } // it IS the queue
 
 			client.RefreshInHousePost();
 		}
