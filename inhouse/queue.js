@@ -20,23 +20,23 @@ module.exports = {
 		client.RefreshInHousePost = function() {
 			client.inhousePosting = true;
 			client.enqueue(config.inhouse_channel, async () => {
-				const channel = client.channels.cache.get(config.inhouse_channel);
-
-				if (client.latestInhousePost != null) {
-					await client.latestInhousePost.delete().catch(console.error);
-				}
-
-				client.resetInactivityTimer();
-
-				await channel.send({
-					components: [client.panels.get("In-House Queue")(client)],
-					files: [file],
-					flags: MessageFlags.IsComponentsV2,
-					allowedMentions: { parse: [] },
-				}).then(msg => {
+				try {
+					const channel = client.channels.cache.get(config.inhouse_channel);
+					if (client.latestInhousePost != null) {
+						await client.latestInhousePost.delete().catch(console.error);
+					}
+					client.resetInactivityTimer();
+					const msg = await channel.send({
+						components: [client.panels.get("In-House Queue")(client)],
+						files: [file],
+						flags: MessageFlags.IsComponentsV2,
+						allowedMentions: { parse: [] },
+					});
 					client.latestInhousePost = msg;
+				}
+ 				finally {
 					client.inhousePosting = false;
-				});
+				}
 			});
 		};
 
