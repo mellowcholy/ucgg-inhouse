@@ -500,6 +500,9 @@ module.exports = {
 			}
 
 			client.matches.delete(number);
+
+			// change quote
+			client.user.setActivity(client.randomQuotes[Math.floor(Math.random() * client.randomQuotes.length)], { type: ActivityType.Custom });
 		};
 
 		client.refreshWinnerVote = function(match) {
