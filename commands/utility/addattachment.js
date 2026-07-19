@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, InteractionContextType, ContainerBuilder, MessageFlags, TextDisplayBuilder } = require("discord.js");
+const { SlashCommandBuilder, PermissionFlagsBits, InteractionContextType, MessageFlags } = require("discord.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -25,6 +25,7 @@ module.exports = {
 
 		await message.edit({
 			files: [attachment],
+			flags: MessageFlags.IsComponentsV2,
 		});
 
 		return;
