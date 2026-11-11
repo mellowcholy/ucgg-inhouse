@@ -14,29 +14,56 @@ module.exports = {
 
 		const config = client.config;
 
-		const file = new AttachmentBuilder("./img/queue_banner.png");
+		client.latestInhousePost = null;
 
-		// create inhouse post func
+		// Post the queue once, then edit that message when the queue changes.
 		client.RefreshInHousePost = function() {
-			client.inhousePosting = true;
-			client.enqueue(config.inhouse_channel, async () => {
-				try {
-					const channel = client.channels.cache.get(config.inhouse_channel);
-					if (client.latestInhousePost != null) {
-						await client.latestInhousePost.delete().catch(console.error);
+			return client.enqueue(config.inhouse_channel, async () => {
+				const channel = client.channels.cache.get(config.inhouse_channel);
+				if (!channel) {
+					console.error("In-house channel not found.");
+					return;
+				}
+
+				client.resetInactivityTimer();
+
+				const payload = {
+					components: [client.panels.get("In-House Queue")(client)],
+					flags: MessageFlags.IsComponentsV2,
+					allowedMentions: { parse: [] },
+				};
+
+				if (client.latestInhousePost == null) {
+					const storedId = await client.keyv.get("inhousePostId");
+					if (storedId) {
+						client.latestInhousePost = await channel.messages.fetch(storedId).catch(() => null);
 					}
-					client.resetInactivityTimer();
-					const msg = await channel.send({
-						components: [client.panels.get("In-House Queue")(client)],
-						files: [file],
-						flags: MessageFlags.IsComponentsV2,
-						allowedMentions: { parse: [] },
-					});
-					client.latestInhousePost = msg;
 				}
- 				finally {
-					client.inhousePosting = false;
+
+				if (client.latestInhousePost == null) {
+					const recent = await channel.messages.fetch({ limit: 50 }).catch(() => null);
+					client.latestInhousePost = recent?.find((message) => message.author.id == client.user.id) ?? null;
 				}
+
+				if (client.latestInhousePost != null) {
+					try {
+						client.latestInhousePost = await client.latestInhousePost.edit(payload);
+						await client.keyv.set("inhousePostId", client.latestInhousePost.id);
+						return;
+					}
+					catch (error) {
+						console.error(error);
+						client.latestInhousePost = null;
+						await client.keyv.delete("inhousePostId");
+					}
+				}
+
+				const msg = await channel.send({
+					...payload,
+					files: [new AttachmentBuilder("./img/queue_banner.png")],
+				});
+				client.latestInhousePost = msg;
+				await client.keyv.set("inhousePostId", msg.id);
 			});
 		};
 
