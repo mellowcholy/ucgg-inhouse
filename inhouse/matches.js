@@ -81,7 +81,6 @@ module.exports = {
 		async function BalanceTeams(match) {
 
 			const players = match.get("positions");
-			const trials = 500;
 
 			const playerMMR = new Collection();
 
@@ -105,115 +104,145 @@ module.exports = {
 				role.push(...mmrData);
 			}
 
-			function PickBestFill(role, fill) {
-				let best = 0;
-				const names = new Array();
+			const roles = [...playerMMR.keys()].filter(r => r !== "Fill");
 
-				fill.forEach(obj => {
-					for (const key of Object.entries(obj)) {
-						names.push(key[0]);
-					}
-				});
-
-				for (let i = 1; i < fill.length; i++) {
-
-					if (fill[i][names[i]][role] > fill[best][names[best]][role]) {
-						best = i;
-					}
-				}
-
-				const chosen = fill.splice(best, 1)[0];
-
-				return { [names[best]]: chosen[names[best]][role] };
-			}
-
-			function MakeTeams() {
-				const fill = [...playerMMR.get("Fill")];
-				const rolePairs = new Collection();
-
-				// fill missing roles
-				for (const [role, rolePlayers] of playerMMR) {
-					if (role == "Fill") { continue; }
-
-					const pair = (rolePlayers);
-
-					while (rolePlayers.length < 2) {
-						const fillPlayer = PickBestFill(role, fill);
-						pair.push(fillPlayer);
-					}
-
-					rolePairs[role] = pair;
-				}
-
-				// random assignment per role
-				const blueSide = new Collection();
-				const redSide = new Collection();
-
-				let totalBlue = 0;
-				let totalRed = 0;
-
-				for (const [role] of playerMMR) {
-					if (role == "Fill") { continue; }
-
-					const [p1, p2] = rolePairs[role];
-
-					if (Math.random() < 0.5) {
-						blueSide.set(role, p1);
-						redSide.set(role, p2);
+			//create the lobby struct convert from list of positions (and whos qing them) to a list of players, each with a role and mmr
+			const lobby = [];
+			for (const [queuedRole, entries] of playerMMR) {
+				for (const entry of entries) {
+					// convert from { [player]: mmr } to {[player,role,mmr]}
+					const [id, value] = Object.entries(entry)[0];
+		
+					if (queuedRole === "Fill") {
+						lobby.push({ id, assignedRole: null, mmr: value });
 					}
 					else {
-						blueSide.set(role, p2);
-						redSide.set(role, p1);
-					}
-
-					totalBlue += Object.values(blueSide.get(role))[0];
-					totalRed += Object.values(redSide.get(role))[0];
-				}
-
-				// greedy balancing swaps
-				for (const [role] of playerMMR) {
-					if (role == "Fill") { continue; }
-
-					const a = Object.values(blueSide.get(role))[0];
-					const b = Object.values(redSide.get(role))[0];
-
-					const diffBefore = Math.abs(totalBlue - totalRed);
-					const newBlue = totalBlue - a + b;
-					const newRed = totalRed - b + a;
-					const diffAfter = Math.abs(newBlue - newRed);
-
-					if (diffAfter < diffBefore) {
-						const swap = blueSide.get(role);
-
-						blueSide.set(role, redSide.get(role));
-						redSide.set(role, swap);
-
-						totalBlue = newBlue;
-						totalRed = newRed;
+						lobby.push({ id, assignedRole: queuedRole, mmr: { [queuedRole]: value } });
 					}
 				}
-
-				return {
-					blueSide,
-					redSide,
-					avgBlue: totalBlue / 5,
-					avgRed: totalRed / 5,
-					diff: Math.abs(totalBlue - totalRed),
-				};
 			}
+
+			//ASSERT(lobby.length==10)
+			if (lobby.length !== 10) {
+				throw new Error(`needs 10 players, got ${lobby.length}`);
+			}
+
+			//gets every way to divide the 10 players into two teams, dont care about balance ATP
+			function getValidTeams() {
+				const splits = [];
+		
+				//loop through a 10 bit unisgned integer, each bit corresponds to the team assignment of one player. 
+				//results in a lot of wasted loops (like 0000000000 puts everyone on team b and then gets discarded) but i still think this is the easiest way to do this
+				for (let lobbyInt = 0; lobbyInt < (1 << lobby.length); lobbyInt++) {
+					const teamA = [];
+					const teamB = [];
+				    
+					//for each player (0-9), get their respective bit by left shifting by their player value
+					lobby.forEach((player, p) => {
+						if (lobbyInt & (1 << p)) { teamA.push(player); }
+						else { teamB.push(player); }
+					});
+		
+					// skip bad team sizes
+					if (teamA.length !== roles.length) { continue; }
+		
+					// Skip teams with two players qd for same role
+					const hasRoleClash = [teamA, teamB].some(team => {
+						const lockedRoles = team.map(player => player.assignedRole).filter(role => role !== null);
+						return new Set(lockedRoles).size < lockedRoles.length; 
+					});
+					if (hasRoleClash) { continue; }
+		
+					splits.push({ teamA, teamB });
+				}
+		
+				return splits;
+			}
+
+
+			//for a given team of 5, return every possible valid role assignemnet for the filled players
+			function getPossibleRoleAssignments(team) {
+				const lockedPart = new Map();//   players with assigned roles
+				const fillPlayers = [];
+				for (const player of team) {
+					if (player.assignedRole === null) {
+						fillPlayers.push(player);
+					}
+					else {
+						lockedPart.set(player.assignedRole, player);
+					}
+				}
+	
+				const freeRoles = roles.filter(r => !lockedPart.has(r)); //call any role not claimed "free"
+		
+				//every way of arranging fill players into free roles. i got AI to rewrite the rest of this function from here so idk how it works but its way shorter than what i had written
+				let orderings = [[]];
+				for (let i = 0; i < fillPlayers.length; i++) {
+					orderings = orderings.flatMap(partial =>
+						freeRoles.filter(role => !partial.includes(role)).map(role => [...partial, role]),
+					);
+				}
+		
+				return orderings.map(ordering => {
+					const assignment = new Map(lockedPart);
+					fillPlayers.forEach((player, i) => assignment.set(ordering[i], player));
+					let total = 0;
+					for (const [role, player] of assignment) { total += player.mmr[role]; }
+					return { total, assignment };
+				});
+			}
+			
 
 			// run multiple simulations and pick the best
 			let best = null;
-			for (let i = 0; i < trials; i++) {
-				const result = MakeTeams();
+			//for every possible way players can be split between red and blue
+			for (const { teamA, teamB } of getValidTeams()) {
 
-				if (!best || result.diff < best.diff) {
-					best = result;
-					if (best.diff == 0) { break; }
+				//get every way players can be arranged within each team
+				const allPossibleTeamAs = getPossibleRoleAssignments(teamA);
+				const allPossibleTeamBs = getPossibleRoleAssignments(teamB);
+
+				//for every possible combination of each team check which has the lowest RELATIVE mmr difference
+				for (const TeamBlue of allPossibleTeamAs) {
+					for (const teamRed of allPossibleTeamBs) {
+						const total = TeamBlue.total + teamRed.total;
+						const relDiff = (Math.abs(TeamBlue.total - teamRed.total))/ total;
+		
+						if (!best || relDiff < best.relDiff) {
+							best = { relDiff, total, TeamBlue, teamRed };
+						}
+					}
 				}
 			}
 
-			return best;
+			//ASSERT(best!=null)
+			if(!best){
+				throw new Error("no valid matchup")
+			}
+
+			//converts from the abstract role asignments back into teams of players
+			function makeTeams(abstractTeam) {
+				const team = new Collection();
+				for (const role of roles) {
+					const player = abstractTeam.assignment.get(role);
+					team.set(role, { [player.id]: player.mmr[role] });
+				}
+				return team;
+			}
+
+
+			const blueSide = makeTeams(best.TeamBlue);
+			const redSide = makeTeams(best.teamRed);
+			const totalBlue = best.TeamBlue.total;
+			const totalRed = best.teamRed.total;
+
+			return {
+				blueSide,
+				redSide,
+				avgBlue: totalBlue / 5,
+				avgRed: totalRed / 5,
+				diff: Math.abs(totalBlue - totalRed),
+			};
 		}
 
 		client.refreshVoteWheel = function(match) {
