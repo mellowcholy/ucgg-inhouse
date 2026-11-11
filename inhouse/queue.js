@@ -28,7 +28,7 @@ module.exports = {
 				client.resetInactivityTimer();
 
 				const payload = {
-					components: [client.panels.get("In-House Queue")(client)],
+					components: [await client.panels.get("In-House Queue")(client)],
 					flags: MessageFlags.IsComponentsV2,
 					allowedMentions: { parse: [] },
 				};
