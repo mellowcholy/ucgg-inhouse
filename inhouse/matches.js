@@ -17,6 +17,7 @@ module.exports = {
 
 			try {
 				const teams = await BalanceTeams(match);
+				if (teams == null) { return; }
 
 				match.set("teams", teams);
 
@@ -106,13 +107,13 @@ module.exports = {
 
 			const roles = [...playerMMR.keys()].filter(r => r !== "Fill");
 
-			//create the lobby struct convert from list of positions (and whos qing them) to a list of players, each with a role and mmr
+			// create the lobby struct convert from list of positions (and whos qing them) to a list of players, each with a role and mmr
 			const lobby = [];
 			for (const [queuedRole, entries] of playerMMR) {
 				for (const entry of entries) {
 					// convert from { [player]: mmr } to {[player,role,mmr]}
 					const [id, value] = Object.entries(entry)[0];
-		
+
 					if (queuedRole === "Fill") {
 						lobby.push({ id, assignedRole: null, mmr: value });
 					}
@@ -122,45 +123,45 @@ module.exports = {
 				}
 			}
 
-			//ASSERT(lobby.length==10)
 			if (lobby.length !== 10) {
-				throw new Error(`needs 10 players, got ${lobby.length}`);
+				logError("Failed to balance teams because the lobby does not have 10 players.", new Error(`needs 10 players, got ${lobby.length}`));
+				return null;
 			}
 
-			//gets every way to divide the 10 players into two teams, dont care about balance ATP
+			// gets every way to divide the 10 players into two teams, dont care about balance ATP
 			function getValidTeams() {
 				const splits = [];
-		
-				//loop through a 10 bit unisgned integer, each bit corresponds to the team assignment of one player. 
-				//results in a lot of wasted loops (like 0000000000 puts everyone on team b and then gets discarded) but i still think this is the easiest way to do this
+
+				// loop through a 10 bit unisgned integer, each bit corresponds to the team assignment of one player.
+				// results in a lot of wasted loops (like 0000000000 puts everyone on team b and then gets discarded) but i still think this is the easiest way to do this
 				for (let lobbyInt = 0; lobbyInt < (1 << lobby.length); lobbyInt++) {
 					const teamA = [];
 					const teamB = [];
-				    
-					//for each player (0-9), get their respective bit by left shifting by their player value
+
+					// for each player (0-9), get their respective bit by left shifting by their player value
 					lobby.forEach((player, p) => {
 						if (lobbyInt & (1 << p)) { teamA.push(player); }
 						else { teamB.push(player); }
 					});
-		
+
 					// skip bad team sizes
 					if (teamA.length !== roles.length) { continue; }
-		
+
 					// Skip teams with two players qd for same role
 					const hasRoleClash = [teamA, teamB].some(team => {
 						const lockedRoles = team.map(player => player.assignedRole).filter(role => role !== null);
-						return new Set(lockedRoles).size < lockedRoles.length; 
+						return new Set(lockedRoles).size < lockedRoles.length;
 					});
 					if (hasRoleClash) { continue; }
-		
+
 					splits.push({ teamA, teamB });
 				}
-		
+
 				return splits;
 			}
 
 
-			//for a given team of 5, return every possible valid role assignemnet for the filled players
+			// for a given team of 5, return every possible valid role assignemnet for the filled players
 			function getPossibleRoleAssignments(team) {
 				const lockedPart = new Map();//   players with assigned roles
 				const fillPlayers = [];
@@ -172,17 +173,17 @@ module.exports = {
 						lockedPart.set(player.assignedRole, player);
 					}
 				}
-	
-				const freeRoles = roles.filter(r => !lockedPart.has(r)); //call any role not claimed "free"
-		
-				//every way of arranging fill players into free roles. i got AI to rewrite the rest of this function from here so idk how it works but its way shorter than what i had written
+
+				const freeRoles = roles.filter(r => !lockedPart.has(r)); // call any role not claimed "free"
+
+				// every way of arranging fill players into free roles. i got AI to rewrite the rest of this function from here so idk how it works but its way shorter than what i had written
 				let orderings = [[]];
 				for (let i = 0; i < fillPlayers.length; i++) {
 					orderings = orderings.flatMap(partial =>
 						freeRoles.filter(role => !partial.includes(role)).map(role => [...partial, role]),
 					);
 				}
-		
+
 				return orderings.map(ordering => {
 					const assignment = new Map(lockedPart);
 					fillPlayers.forEach((player, i) => assignment.set(ordering[i], player));
@@ -191,23 +192,23 @@ module.exports = {
 					return { total, assignment };
 				});
 			}
-			
+
 
 			// run multiple simulations and pick the best
 			let best = null;
-			//for every possible way players can be split between red and blue
+			// for every possible way players can be split between red and blue
 			for (const { teamA, teamB } of getValidTeams()) {
 
-				//get every way players can be arranged within each team
+				// get every way players can be arranged within each team
 				const allPossibleTeamAs = getPossibleRoleAssignments(teamA);
 				const allPossibleTeamBs = getPossibleRoleAssignments(teamB);
 
-				//for every possible combination of each team check which has the lowest RELATIVE mmr difference
+				// for every possible combination of each team check which has the lowest RELATIVE mmr difference
 				for (const TeamBlue of allPossibleTeamAs) {
 					for (const teamRed of allPossibleTeamBs) {
 						const total = TeamBlue.total + teamRed.total;
 						const relDiff = (Math.abs(TeamBlue.total - teamRed.total))/ total;
-		
+
 						if (!best || relDiff < best.relDiff) {
 							best = { relDiff, total, TeamBlue, teamRed };
 						}
@@ -215,12 +216,12 @@ module.exports = {
 				}
 			}
 
-			//ASSERT(best!=null)
-			if(!best){
-				throw new Error("no valid matchup")
+			if (!best) {
+				logError("Failed to balance teams because no valid matchup was found.", new Error("no valid matchup"));
+				return null;
 			}
 
-			//converts from the abstract role asignments back into teams of players
+			// converts from the abstract role asignments back into teams of players
 			function makeTeams(abstractTeam) {
 				const team = new Collection();
 				for (const role of roles) {
