@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, InteractionContextType } = require("discord.js");
+const logError = require("../../utility/log-error.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -18,7 +19,7 @@ Also, if you believe you have differing levels of skills for different roles, co
 
 Furthermore, make sure to check out the in-house and server rules: https://discord.com/channels/1075695611812261919/1278077121801097337
 
-We hope you enjoy your stay, and we'll see you on summoner's rift!`).catch(console.error);
+We hope you enjoy your stay, and we'll see you on summoner's rift!`).catch((error) => logError("Failed to send the welcome message.", error));
 		return;
 	},
 };

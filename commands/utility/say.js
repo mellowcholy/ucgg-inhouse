@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, InteractionContextType, MessageFlags } = require("discord.js");
+const logError = require("../../utility/log-error.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -17,18 +18,18 @@ module.exports = {
 			});
 		}
 		catch (error) {
-			console.error(error);
+			logError("Failed to send that message.", error);
 			await interaction.reply({
 				content: "Failed to send that message.",
 				flags: MessageFlags.Ephemeral,
-			}).catch(console.error);
+			}).catch((replyError) => logError("Failed to tell you that the message could not be sent.", replyError));
 			return;
 		}
 
 		await interaction.reply({
 			content: "Message sent.",
 			flags: MessageFlags.Ephemeral,
-		});
+		}).catch((error) => logError("Failed to confirm that the message was sent.", error));
 
 		return;
 	},
