@@ -13,6 +13,10 @@ module.exports = {
 			["Fill", new Array()],
 		]);
 
+		// players who have been taken out of the queue for a match that is not in client.matches yet.
+		// opening a match means waiting on discord, and for that moment they are in neither place.
+		client.pendingPlayers = new Set();
+
 		const config = client.config;
 
 		client.latestInhousePost = null;
@@ -78,6 +82,8 @@ module.exports = {
 			});
 		};
 
+		const requeueDuringMatchMinTime = 1000 * 60 * (config.requeue_after_minutes ?? 15); // 15 minutes
+
 		// create join queue func
 		client.JoinQueue = async function(userId, position) {
 			const queue = client.queue;
@@ -102,12 +108,32 @@ module.exports = {
 				return 5;
 			}
 
+			// check if they are being placed in a match right now
+			if (client.pendingPlayers.has(userId)) {
+				return 6;
+			}
+
 			// check if they are in a match
 			for (const [, match] of client.matches) {
 				const players = match.get("players");
 				for (let i = 0; i < players.length; i++) {
 					if (players[i] == userId) {
-						return 2;
+						// incentivize voting for match winner instead of camping the join queue button:
+						// if the player has voted for the winner of the match and the match is older than x minutes
+						// allow them to re-join the queue
+						const winnerVotesBlue = match.get("winnerVotesBlue") ?? [];
+						const winnerVotesRed = match.get("winnerVotesRed") ?? [];
+						const hasVoted = winnerVotesBlue.includes(userId) || winnerVotesRed.includes(userId);
+						const matchIsOlderThanMinRequirement = match.get("start_time") &&
+							new Date().getTime() - match.get("start_time") > requeueDuringMatchMinTime;
+
+						// if there is any match that is too "young" (likely still being played), don't let them in.
+						// this includes a match that has not started yet
+						if (!matchIsOlderThanMinRequirement) return 6;
+
+						// the match is old enough to be over, but the player hasn't voted in it: don't let them in,
+						// and the reply for this one tells them to vote
+						if (!hasVoted) return 2;
 					}
 				}
 			}
@@ -213,15 +239,25 @@ module.exports = {
 
 		// queue pop
 		async function QueuePop() {
+			// OpenMatch adds each player to this as it takes them out of the queue
+			const taken = new Array();
+
 			try {
-				await OpenMatch();
+				await OpenMatch(taken);
 			}
 			catch (error) {
 				logError("Failed to open a match lobby.", error);
 			}
+			finally {
+				// the match is in client.matches now, or it could not be opened.
+				// either way these players are no longer in between, so stop holding them
+				for (const player of taken) {
+					client.pendingPlayers.delete(player);
+				}
+			}
 		}
 
-		async function OpenMatch() {
+		async function OpenMatch(taken) {
 			// consolidate players into a match object
 			const queue = client.queue;
 			const match = new Collection();
@@ -249,6 +285,11 @@ module.exports = {
 
 				for (let i = 0; i < num; i++) {
 					const player = queuePos.shift();
+
+					// hold them until the match is registered. this runs before the first await,
+					// so there is no moment where a popped player is not held
+					taken.push(player);
+					client.pendingPlayers.add(player);
 
 					pingString += `<@${player}> `;
 

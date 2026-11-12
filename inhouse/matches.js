@@ -1,4 +1,4 @@
-const { Collection, MessageFlags, ChannelType } = require("discord.js");
+const { Collection, MessageFlags, ChannelType, ActivityType } = require("discord.js");
 const modifiers = require('../modifiers.json');
 const logError = require("../utility/log-error.js");
 
@@ -359,12 +359,17 @@ module.exports = {
 					channel.send("The wheel will not be spun.").catch((error) => logError("Failed to post the wheel result.", error));
 				}
 
+				SetMatchStartTime(match);
 				MoveToVoice(match);
 			}
 			catch (error) {
 				logError("Failed to finish the wheel vote.", error);
 			}
 		};
+
+		function SetMatchStartTime(match) {
+			match.set("start_time", new Date().getTime());
+		}
 
 		function WheelVote(match) {
 			// cleanup match data

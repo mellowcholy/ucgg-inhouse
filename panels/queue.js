@@ -68,7 +68,7 @@ module.exports = {
 
 					case 2:
 						await interaction.reply({
-							content: 'You are still in a match. If it has completed, make sure everyone has voted for the winner.',
+							content: 'You are still in a match. If it has completed, make sure you have voted for the winner, then try again.',
 							flags: MessageFlags.Ephemeral,
 						});
 						return;
@@ -94,6 +94,13 @@ module.exports = {
 					case 5:
 						await interaction.reply({
 							content: 'Your MMR has not been set. Please contact a moderator if you would like to play!',
+							flags: MessageFlags.Ephemeral,
+						});
+						return;
+
+					case 6:
+						await interaction.reply({
+							content: 'You are still in a match.',
 							flags: MessageFlags.Ephemeral,
 						});
 						return;
