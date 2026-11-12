@@ -4,7 +4,8 @@
   "description": "In-House bot for UCGG",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test",
+    "test:watch": "node --test --watch"
   },
   "author": "mellowcholy",
   "license": "ISC",
