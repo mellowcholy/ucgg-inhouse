@@ -335,6 +335,7 @@ module.exports = {
 		client.wheelResult = function(match, result, modifier = "none") {
 			if (match.get("modifier_locked")) { return; }
 			match.set("modifier_locked", true);
+			match.set("wheelSpun", result == true);
 
 			try {
 				const wheelVoteMessage = match.get("wheelVoteMsg");

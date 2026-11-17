@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, InteractionContextType } = require("discord.js");
+const { SlashCommandBuilder, InteractionContextType, MessageFlags } = require("discord.js");
 const logError = require("../../utility/log-error.js");
 
 module.exports = {
@@ -16,9 +16,30 @@ module.exports = {
 		)
 		.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
+		const client = interaction.client;
+		const match = client.matchChannels?.get(interaction.channelId);
+
+		if (match == null) {
+			await interaction.reply({
+				content: "Tickets can only be used in a match channel.",
+				flags: MessageFlags.Ephemeral,
+			}).catch((error) => logError("Failed to tell the user tickets can only be used in a match channel.", error));
+			return;
+		}
+
+		if (match.get("wheelSpun") !== false) {
+			const content = match.get("wheelSpun")
+				? "Tickets cannot be used because the wheel was spun."
+				: "Tickets can only be used after the wheel vote decides not to spin.";
+			await interaction.reply({
+				content,
+				flags: MessageFlags.Ephemeral,
+			}).catch((error) => logError("Failed to tell the user this ticket cannot be used yet.", error));
+			return;
+		}
+
 		await interaction.deferReply();
 
-		const client = interaction.client;
 		const id = interaction.user.id;
 
 		const item = interaction.options.getString("item");
