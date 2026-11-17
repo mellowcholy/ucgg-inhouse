@@ -17,8 +17,29 @@ module.exports = {
 
 		client.latestInhousePost = null;
 
+		async function notifyQueueUpdate(channel) {
+			let msg;
+			try {
+				msg = await channel.send({
+					content: "Queue updated.",
+					allowedMentions: { parse: [] },
+				});
+			}
+			catch (error) {
+				logError("Failed to send the queue update notification.", error);
+				return;
+			}
+
+			try {
+				await msg.delete();
+			}
+			catch (error) {
+				logError("Failed to delete the queue update notification.", error);
+			}
+		}
+
 		// Post the queue once, then edit that message when the queue changes.
-		client.RefreshInHousePost = function() {
+		client.RefreshInHousePost = function(notify = false) {
 			return client.enqueue(config.inhouse_channel, async () => {
 				try {
 					const channel = client.channels.cache.get(config.inhouse_channel);
@@ -51,7 +72,6 @@ module.exports = {
 						try {
 							client.latestInhousePost = await client.latestInhousePost.edit(payload);
 							await client.keyv.set("inhousePostId", client.latestInhousePost.id);
-							return;
 						}
 						catch (error) {
 							logError("Failed to edit the queue message.", error);
@@ -60,17 +80,21 @@ module.exports = {
 						}
 					}
 
-					try {
-						const msg = await channel.send({
-							...payload,
-							files: [new AttachmentBuilder("./img/queue_banner.png")],
-						});
-						client.latestInhousePost = msg;
-						await client.keyv.set("inhousePostId", msg.id);
+					if (client.latestInhousePost == null) {
+						try {
+							const msg = await channel.send({
+								...payload,
+								files: [new AttachmentBuilder("./img/queue_banner.png")],
+							});
+							client.latestInhousePost = msg;
+							await client.keyv.set("inhousePostId", msg.id);
+						}
+						catch (error) {
+							logError("Failed to post the queue message.", error);
+						}
 					}
-					catch (error) {
-						logError("Failed to post the queue message.", error);
-					}
+
+					if (notify) { await notifyQueueUpdate(channel); }
 				}
 				catch (error) {
 					logError("Failed to update the queue message.", error);
@@ -156,7 +180,7 @@ module.exports = {
 				if (empty) { return; }
 
 				console.log("CLEARING QUEUE FOR INACTIVITY");
-				client.RefreshInHousePost();
+				client.RefreshInHousePost(true);
 			}, 18000 * 1000);
 		};
 

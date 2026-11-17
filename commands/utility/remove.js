@@ -22,7 +22,7 @@ module.exports = {
 			await interaction.editReply({
 				content: `<@${target.id}> has been removed from the queue.`,
 				flags: MessageFlags.Ephemeral,
-			}).catch((error) => logError("Failed to confirm that the player was removed from the queue.", error)).then(client.RefreshInHousePost());
+			}).catch((error) => logError("Failed to confirm that the player was removed from the queue.", error)).then(client.RefreshInHousePost(true));
 			return;
 
 		case 1:

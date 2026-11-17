@@ -63,7 +63,7 @@ module.exports = {
 						await interaction.reply({
 							content: `You have succesfully joined ${pos}.`,
 							flags: MessageFlags.Ephemeral,
-						}).then(client.RefreshInHousePost());
+						}).then(client.RefreshInHousePost(true));
 						return;
 
 					case 2:
@@ -110,7 +110,7 @@ module.exports = {
 					await interaction.reply({
 						content: 'You have left the queue.',
 						flags: MessageFlags.Ephemeral,
-					}).then(client.RefreshInHousePost());
+					}).then(client.RefreshInHousePost(true));
 					return;
 
 				case 1:

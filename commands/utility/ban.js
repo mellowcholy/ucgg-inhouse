@@ -28,7 +28,7 @@ module.exports = {
 
 		// remove them from queue
 		const result = await client.LeaveQueue(userId);
-		if (result == 0) { await client.RefreshInHousePost(); }
+		if (result == 0) { await client.RefreshInHousePost(true); }
 
 		await interaction.editReply({
 			content: `<@${target.id}> has been banned from the queue${time == -67 ? "." : ` for ${time} seconds.`}`,
