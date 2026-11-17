@@ -16,30 +16,6 @@ module.exports = {
 		const config = client.config;
 
 		client.latestInhousePost = null;
-		client.queueChannelCount = null;
-
-		const keycaps = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"];
-
-		function queueCountEmoji(count) {
-			if (count == 10) { return "🔟"; }
-			return String(count).split("").map((digit) => keycaps[digit]).join("");
-		}
-
-		async function renameQueueChannel(channel) {
-			let count = 0;
-			for (const roleQueue of client.queue.values()) {
-				count += roleQueue.length;
-			}
-			if (client.queueChannelCount == count) { return; }
-
-			try {
-				await channel.setName(`📑-in-houses-${queueCountEmoji(count)}`);
-				client.queueChannelCount = count;
-			}
-			catch (error) {
-				logError("Failed to rename the in-house channel.", error);
-			}
-		}
 
 		// Post the queue once, then edit that message when the queue changes.
 		client.RefreshInHousePost = function() {
@@ -51,7 +27,6 @@ module.exports = {
 						return;
 					}
 
-					await renameQueueChannel(channel);
 					client.resetInactivityTimer();
 
 					const payload = {
