@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "In-House bot for UCGG",
   "main": "index.js",
-  "scripts": {
-    "test": "node --test",
-    "test:watch": "node --test --watch"
-  },
   "author": "mellowcholy",
   "license": "ISC",
   "dependencies": {
