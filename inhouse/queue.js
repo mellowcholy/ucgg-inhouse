@@ -99,6 +99,11 @@ module.exports = {
 				catch (error) {
 					logError("Failed to update the queue message.", error);
 				}
+				finally {
+					if (client.updateQueueVoiceStatus != null) {
+						await client.updateQueueVoiceStatus();
+					}
+				}
 			});
 		};
 

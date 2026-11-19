@@ -29,6 +29,9 @@ module.exports = {
 		const matches = require("../inhouse/matches.js");
 		matches.run(client);
 
+		const queueVoice = require("../inhouse/queue-voice.js");
+		queueVoice.run(client);
+
 		// send initial queue
 		client.RefreshInHousePost();
 	},

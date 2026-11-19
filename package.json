@@ -9,6 +9,7 @@
   "author": "mellowcholy",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/voice": "^0.19.2",
     "@keyv/sqlite": "^4.0.6",
     "@napi-rs/canvas": "^0.1.80",
     "discord.js": "^14.22.1",
